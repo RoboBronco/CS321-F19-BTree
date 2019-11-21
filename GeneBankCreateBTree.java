@@ -31,52 +31,107 @@ public class GeneBankCreateBTree {
         return this.cacheSize;
     }
 
+    private static boolean validSequence(String data, int startIndex, int seqLen){
+        boolean valid = true;
+        int maxStartIndex = data.length()-seqLen;
+        if( startIndex > maxStartIndex){
+            valid = false;
+            return valid;
+        }
+        for (int i=startIndex; i<startIndex+seqLen; i++){
+            if( data.charAt(i) == 'n'){
+                valid = false;
+                return valid;
+            }
+        }
+        return valid;
+    }
+
+    private static String objectString(String data, int startIndex, int seqLen){
+        String objString = "";
+        for (int i=0; i<seqLen; i++){
+            objString += data.charAt(startIndex + i);
+        }
+        System.out.println(stringToLong(objString));    // for testing purposes
+        return objString;
+    }
+
+    private static long stringToLong(String objectString){
+        long objValue = 0;
+        String binaryString = "";
+        for(int i=0; i<objectString.length(); i++){
+            if (objectString.charAt(i) == 'a'){
+                binaryString += "00";
+            } else if (objectString.charAt(i) == 'c'){
+                binaryString += "01";
+            } else if (objectString.charAt(i) == 'g'){
+                binaryString += "10";
+            } else if (objectString.charAt(i) == 't'){
+                binaryString += "11";
+            }
+        }
+        objValue = Long.parseLong(binaryString,2);
+        return objValue;
+    }
+
     public static void main (String[] args) throws FileNotFoundException {
         GeneBankCreateBTree bTree = new GeneBankCreateBTree();
-        System.out.println(args.length);
-        System.out.println(args[2]);
+
         if(args.length < 4 || args.length > 6){
             useage();
         }
 
         boolean useCache = false; // configure using args[0]
         int degree = Integer.parseInt(args[1]); // set degree from args[1]
+
+        String fileName = "test3.gbk";
+        // String fileName = args[2]; 
+        // I can't get it to recognize the filename if I pass it in as args[2].
+        // I have to hard-code the filename for testing purposes.
+        // This needs to be addressed.
+
         int sequenceLength = Integer.parseInt(args[3]); // set sequence length from args[3]
 
-        // try to parse through the gbk file
-        // try{
-            File file = new File(args[2]);
-            Scanner scanner = new Scanner(file);
-            String startPt = "ORIGIN";
-            String stopPt = "//";
-            Boolean foundStartPt = false;
-            Boolean foundStopPt = false;
+        // parse through the gbk file
+        File file = new File(fileName);        
+        Scanner scanner = new Scanner(file);
+        String startPt = "ORIGIN";
+        String stopPt = "//";
+        String dataString = "";
+        Boolean foundStartPt = false;
+        Boolean foundStopPt = false;
 
-            while(!foundStartPt){
-                if (scanner.hasNextLine()){
-                    String fileString = scanner.nextLine();
-                    if (fileString.equals(startPt)){
-                        foundStartPt = true;
-                    }                    
+        while(!foundStartPt){
+            if (scanner.hasNext()){
+                String fileString = scanner.next();
+                if (fileString.equals(startPt)){
+                    foundStartPt = true;
+                }        
+            }
+        }
+        while(!foundStopPt && foundStartPt){
+            if (scanner.hasNext()){
+                String fileString = scanner.next();
+                if (fileString.equals(stopPt)){
+                    foundStopPt = true;
+                    break;
+                }
+                if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g") || fileString.startsWith("t") || fileString.startsWith("n")){
+                    dataString += fileString;
                 }
             }
-            while(!foundStopPt && foundStartPt){
-                if (scanner.hasNextLine()){
-                    String dataString = scanner.nextLine();
-                    if (dataString.equals(stopPt)){
-                        foundStopPt = true;
-                        return;
-                    }
-                    System.out.println(dataString); // initial test to see if parsing is working correctly
-                    // need to break data into moving window groups of sequenceLength size
-                }
+        }
+        // break data into moving window groups of sequenceLength size
+        // for(int i=0; i<dataString.length()-sequenceLength; i++){     // for full list of data
+        for(int i=0; i<50; i++){    // for testing purposes
+            if( validSequence(dataString,i,sequenceLength)){
+                System.out.println(objectString(dataString,i,sequenceLength));  // for testing purposes
+                // Build Data Object for Tree and insert into tree
             }
-            
-
-        // } catch (Exception e){
-        //     useage();
-        // }
-        
+        }
+        // System.out.println(dataString);
+        // System.out.println(dataString.length());
+        scanner.close();
 
 
         if (args.length == 4) {
