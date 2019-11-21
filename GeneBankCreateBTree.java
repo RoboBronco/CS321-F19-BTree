@@ -82,13 +82,16 @@ public class GeneBankCreateBTree {
         }
 
         boolean useCache = false; // configure using args[0]
+        if (Integer.parseInt(args[0]) == 1){
+            useCache = true;
+        }
         int degree = Integer.parseInt(args[1]); // set degree from args[1]
 
         String fileName = "test3.gbk";
         // String fileName = args[2]; 
         // I can't get it to recognize the filename if I pass it in as args[2].
         // I have to hard-code the filename for testing purposes.
-        // This needs to be addressed.
+        // This needs to be addressed!
 
         int sequenceLength = Integer.parseInt(args[3]); // set sequence length from args[3]
 
