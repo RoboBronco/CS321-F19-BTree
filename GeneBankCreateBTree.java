@@ -79,7 +79,7 @@ public class GeneBankCreateBTree {
 		GeneBankCreateBTree bTree = new GeneBankCreateBTree();
 		int degree = -1;
 		String fileName = args[2];
-		
+		int sequenceLength = 0;
 		try {
 			degree = Integer.parseInt(args[1]);
 		} catch (Exception e) {
@@ -90,7 +90,6 @@ public class GeneBankCreateBTree {
 			//need to create algorith to compute this value, using what was provided in class currently
 			degree = 127;
 		}
-		int sequenceLength = 0;
 		try {
 			sequenceLength = Integer.parseInt(args[3]);
 		} catch (Exception e) {
