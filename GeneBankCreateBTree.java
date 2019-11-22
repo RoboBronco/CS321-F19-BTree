@@ -78,23 +78,9 @@ public class GeneBankCreateBTree {
 	public static void main(String[] args) throws FileNotFoundException {
 		GeneBankCreateBTree bTree = new GeneBankCreateBTree();
 
-		if (args.length < 4 || args.length > 6) {
-			useage();
-		}
-
-		boolean useCache = false; // configure using args[0]
-		if (Integer.parseInt(args[0]) == 1) {
-			useCache = true;
-		}
-		int degree = Integer.parseInt(args[1]); // set degree from args[1]
-
-		// String fileName = "test3.gbk";
+		int degree = Integer.parseInt(args[1]);
 		String fileName = args[2];
-		// I can't get it to recognize the filename if I pass it in as args[2].
-		// I have to hard-code the filename for testing purposes.
-		// This needs to be addressed!
-
-		int sequenceLength = Integer.parseInt(args[3]); // set sequence length from args[3]
+		int sequenceLength = Integer.parseInt(args[3]);
 
 		// parse through the gbk file
 		File file = new File(fileName);
@@ -141,9 +127,7 @@ public class GeneBankCreateBTree {
 
 		if (args.length == 4) {
 			if (args[0].equals("0")) {
-				// no cache
-			} else if (args[0].equals("1")) {
-				// cache -> should be args[4] for cache size
+				// no cache, only option for args length 4
 			} else {
 				useage();
 			}
@@ -152,10 +136,12 @@ public class GeneBankCreateBTree {
 				try {
 					bTree.setDebugLevel(Integer.parseInt(args[4]));
 				} catch (Exception e) {
+					System.out.println(args[4] + " is not an integer.");
 					useage();
 				}
 			} else if (args[0].equals("1")) {
 				try {
+					System.out.println(args[4] + " is not an integer.");
 					bTree.setCacheSize(Integer.parseInt(args[4]));
 				} catch (Exception e) {
 					useage();
@@ -168,11 +154,13 @@ public class GeneBankCreateBTree {
 				try {
 					bTree.setCacheSize(Integer.parseInt(args[4]));
 				} catch (Exception e) {
+					System.out.println(args[4] + " is not an integer.");
 					useage();
 				}
 				try {
 					bTree.setDebugLevel(Integer.parseInt(args[5]));
 				} catch (Exception e) {
+					System.out.println(args[5] + " is not an integer.");
 					useage();
 				}
 			} else {
