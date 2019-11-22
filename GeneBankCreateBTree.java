@@ -3,33 +3,156 @@ import java.io.*;
 
 public class GeneBankCreateBTree {
 
+	public int degree;
+	public File fileName;
+	public int sequenceLength;
 	public int cacheSize;
-	public int debugLevel;
 
-	public GeneBankCreateBTree() {
-
+	public int getDegree() {
+		return this.degree;
 	}
 
-	public static void useage() {
-		System.out.println(
-				"Usage: java GeneBankCreateBTree <0/1(no/with Cache)> <degree> <gbk file> <sequence length> [<cache size>] [<debug level>]");
-		System.exit(-1);
+	public File getFile() {
+		return this.fileName;
 	}
 
-	public void setCacheSize(int size) {
-		this.cacheSize = size;
-	}
-
-	public void setDebugLevel(int level) {
-		this.debugLevel = level;
-	}
-
-	public int getDebugLevel() {
-		return this.debugLevel;
+	public int getSequenceLength() {
+		return this.sequenceLength;
 	}
 
 	public int getCacheSize() {
 		return this.cacheSize;
+	}
+
+	//constructor with cache and debug
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize, String debugLevel) {
+		if (cache.equals("1")) {
+			this.fileName = new File(fileName);
+			try {
+				this.degree = Integer.parseInt(degree);
+				this.sequenceLength = Integer.parseInt(sequenceLength);
+				this.cacheSize = Integer.parseInt(cacheSize);
+			} catch (Exception e) {
+				useage();
+			}
+			if (this.degree == 0) {
+				//calculate the optimal degree
+				//temporary value below
+				this.degree = 127;
+			} else if (this.degree < 0) {
+				useage();
+			}
+			if(!this.fileName.exists() || this.fileName.isDirectory()) { 
+				useage();
+			}
+			if (this.sequenceLength < 1 || this.sequenceLength > 31) {
+				useage();
+			}
+			if (this.cacheSize < 1) {
+				useage();
+			}
+			if (debugLevel.equals("0")) {
+				//debug level 0
+			} else if (debugLevel.equals("1")) {
+				//debug level 1, dump file
+			} else {
+				useage();
+			}
+		} else {
+			useage();
+		}
+	}
+	//constructor with cache or debug
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSizeOrDebug) {
+		if (cache.equals("0")) {
+			this.fileName = new File(fileName);
+			try {
+				this.degree = Integer.parseInt(degree);
+				this.fileName = new File(fileName);
+				this.sequenceLength = Integer.parseInt(sequenceLength);
+			} catch (Exception e) {
+				useage();
+			}
+			if (this.degree == 0) {
+				//calculate the optimal degree
+				//temporary value below
+				this.degree = 127;
+			} else if (this.degree < 0) {
+				useage();
+			}
+			if(!this.fileName.exists() || this.fileName.isDirectory()) { 
+				useage();
+			}
+			if (this.sequenceLength < 1 || this.sequenceLength > 31) {
+				useage();
+			}
+			if (cacheSizeOrDebug.equals("0")) {
+				//debug level 0
+			} else if (cacheSizeOrDebug.equals("1")) {
+				//debug level 1, dump file
+			} else {
+				useage();
+			}
+		} else if (cache.equals("1")) {
+			this.fileName = new File(fileName);
+			try {
+				this.degree = Integer.parseInt(degree);
+				this.sequenceLength = Integer.parseInt(sequenceLength);
+				this.cacheSize = Integer.parseInt(cacheSizeOrDebug);
+			} catch (Exception e) {
+				useage();
+			}
+			if (this.degree == 0) {
+				//calculate the optimal degree
+				//temporary value below
+				this.degree = 127;
+			} else if (this.degree < 0) {
+				useage();
+			}
+			if(!this.fileName.exists() || this.fileName.isDirectory()) { 
+				useage();
+			}
+			if (this.sequenceLength < 1 || this.sequenceLength > 31) {
+				useage();
+			}
+			if (this.cacheSize < 1) {
+				useage();
+			}
+		} else {
+			useage();
+		}
+	}
+	//constructor without cache or debug
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength) {
+		if (cache.equals("0")) {
+			this.fileName = new File(fileName);
+			try {
+				this.degree = Integer.parseInt(degree);
+				this.sequenceLength = Integer.parseInt(sequenceLength);
+			} catch (Exception e) {
+				useage();
+			}
+			if (this.degree == 0) {
+				//calculate the optimal degree
+				//temporary value below
+				this.degree = 127;
+			} else if (this.degree < 0) {
+				useage();
+			}
+			if(!this.fileName.exists() || this.fileName.isDirectory()) { 
+				useage();
+			}
+			if (this.sequenceLength < 1 || this.sequenceLength > 31) {
+				useage();
+			}
+		} else {
+			useage();
+		}
+	}
+
+	public static void useage() {
+		System.out.println("Usage: java GeneBankCreateBTree <0/1(no/with Cache)> <degree> <gbk file> <sequence length> [<cache size>] [<debug level>]");
+		System.exit(-1);
 	}
 
 	private static boolean validSequence(String data, int startIndex, int seqLen) {
@@ -76,33 +199,19 @@ public class GeneBankCreateBTree {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
-		GeneBankCreateBTree bTree = new GeneBankCreateBTree();
-		int degree = -1;
-		String fileName = args[2];
-		int sequenceLength = 0;
-		try {
-			degree = Integer.parseInt(args[1]);
-		} catch (Exception e) {
-			System.out.println(args[1] + " is not an integer.");
-			useage();
-		}
-		if (degree == 0) {
-			//need to create algorith to compute this value, using what was provided in class currently
-			degree = 127;
-		}
-		try {
-			sequenceLength = Integer.parseInt(args[3]);
-		} catch (Exception e) {
-			System.out.println(args[3] + " is not an integer.");
-			useage();
-		}
-		if (sequenceLength < 1 || sequenceLength > 31) {
-			System.out.println("Sequence length must be between 1 and 31 inclusive.");
+		GeneBankCreateBTree bTree = null;
+		if (args.length == 4) {
+			bTree = new GeneBankCreateBTree(args[0], args[1], args[2], args[3]);
+		} else if (args.length == 5) {
+			bTree = new GeneBankCreateBTree(args[0], args[1], args[2], args[3], args[4]);
+		} else if (args.length == 6) {
+			bTree = new GeneBankCreateBTree(args[0], args[1], args[2], args[3], args[4], args[5]);
+		} else {
 			useage();
 		}
 
 		// parse through the gbk file
-		File file = new File(fileName);
+		File file = bTree.getFile();
 		Scanner scanner = new Scanner(file);
 		String startPt = "ORIGIN";
 		String stopPt = "//";
@@ -134,60 +243,13 @@ public class GeneBankCreateBTree {
 		// break data into moving window groups of sequenceLength size
 		// for(int i=0; i<dataString.length()-sequenceLength; i++){ // for full list of data
 		for (int i = 0; i < 50; i++) { // for testing purposes
-			if (validSequence(dataString, i, sequenceLength)) {
-				System.out.println(objectString(dataString, i, sequenceLength)); // for testing purposes
+			if (validSequence(dataString, i, bTree.getSequenceLength())) {
+				System.out.println(objectString(dataString, i, bTree.getSequenceLength())); // for testing purposes
 				// Build Data Object for Tree and insert into tree
 			}
 		}
 		// System.out.println(dataString);
 		// System.out.println(dataString.length());
 		scanner.close();
-
-		if (args.length == 4) {
-			if (args[0].equals("0")) {
-				// no cache
-			} else {
-				System.out.println("Cache option selected, but no cache Size was not provided.");
-				useage();
-			}
-		} else if (args.length == 5) {
-			if (args[0].equals("0")) {
-				try {
-					bTree.setDebugLevel(Integer.parseInt(args[4]));
-				} catch (Exception e) {
-					System.out.println(args[4] + " is not an integer.");
-					useage();
-				}
-			} else if (args[0].equals("1")) {
-				try {
-					bTree.setCacheSize(Integer.parseInt(args[4]));
-				} catch (Exception e) {
-					System.out.println(args[4] + " is not an integer.");
-					useage();
-				}
-			} else {
-				useage();
-			}
-		} else if (args.length == 6) {
-			if (args[0].equals("1")) {
-				try {
-					bTree.setCacheSize(Integer.parseInt(args[4]));
-				} catch (Exception e) {
-					System.out.println(args[4] + " is not an integer.");
-					useage();
-				}
-				try {
-					bTree.setDebugLevel(Integer.parseInt(args[5]));
-				} catch (Exception e) {
-					System.out.println(args[5] + " is not an integer.");
-					useage();
-				}
-			} else {
-				System.out.println("Cache option not selected " + args[0] + ", but cache size provided " + args[4] + ".");
-				useage();
-			}
-		} else {
-			useage();
-		}
 	}
 }
