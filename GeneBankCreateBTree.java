@@ -3,10 +3,8 @@ import java.io.*;
 
 public class GeneBankCreateBTree {
 
-	public int degree;
+	public int degree, sequenceLength, cacheSize;
 	public File fileName;
-	public int sequenceLength;
-	public int cacheSize;
 
 	public int getDegree() {
 		return this.degree;
