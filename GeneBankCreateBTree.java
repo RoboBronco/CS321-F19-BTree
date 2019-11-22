@@ -87,13 +87,7 @@ public class GeneBankCreateBTree {
 			useCache = true;
 		}
 		int degree = Integer.parseInt(args[1]); // set degree from args[1]
-
-		// String fileName = "test3.gbk";
-		String fileName = args[2];
-		// I can't get it to recognize the filename if I pass it in as args[2].
-		// I have to hard-code the filename for testing purposes.
-		// This needs to be addressed!
-
+		String fileName = args[2]; // set file to be used from args[2]
 		int sequenceLength = Integer.parseInt(args[3]); // set sequence length from args[3]
 
 		// parse through the gbk file
@@ -127,8 +121,7 @@ public class GeneBankCreateBTree {
 			}
 		}
 		// break data into moving window groups of sequenceLength size
-		// for(int i=0; i<dataString.length()-sequenceLength; i++){ // for full list of
-		// data
+		// for(int i=0; i<dataString.length()-sequenceLength; i++){ // for full list of data
 		for (int i = 0; i < 50; i++) { // for testing purposes
 			if (validSequence(dataString, i, sequenceLength)) {
 				System.out.println(objectString(dataString, i, sequenceLength)); // for testing purposes
