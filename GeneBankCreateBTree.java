@@ -66,7 +66,6 @@ public class GeneBankCreateBTree {
 			this.fileName = new File(fileName);
 			try {
 				this.degree = Integer.parseInt(degree);
-				this.fileName = new File(fileName);
 				this.sequenceLength = Integer.parseInt(sequenceLength);
 			} catch (Exception e) {
 				useage();
