@@ -78,10 +78,11 @@ public class GeneBankCreateBTree {
 	public static void main(String[] args) throws FileNotFoundException {
 		GeneBankCreateBTree bTree = new GeneBankCreateBTree();
 		int degree = -1;
-		int sequenceLength = 0;
+		String fileName = args[2];
+		
 		try {
 			degree = Integer.parseInt(args[1]);
-		} catch (Exception e) {
+		} catch (NumberFormatException e) {
 			System.out.println(args[1] + " is not an integer.");
 			useage();
 		}
@@ -89,7 +90,7 @@ public class GeneBankCreateBTree {
 			//need to create algorith to compute this value, using what was provided in class currently
 			degree = 127;
 		}
-		String fileName = args[2];
+		int sequenceLength = 0;
 		try {
 			sequenceLength = Integer.parseInt(args[3]);
 		} catch (Exception e) {
@@ -184,7 +185,7 @@ public class GeneBankCreateBTree {
 					useage();
 				}
 			} else {
-				System.out.println("Cache option selected, but no cache Size was not provided.");
+				System.out.println("Cache option not selected " + args[0] + ", but cache size provided " + args[4] + ".");
 				useage();
 			}
 		} else {
