@@ -93,7 +93,7 @@ public class GeneBankCreateBTree {
 		int sequenceLength = 0;
 		try {
 			sequenceLength = Integer.parseInt(args[3]);
-		} catch (Exception e) {
+		} catch (NumberFormateException e) {
 			System.out.println(args[3] + " is not an integer.");
 			useage();
 		}
@@ -156,14 +156,14 @@ public class GeneBankCreateBTree {
 			if (args[0].equals("0")) {
 				try {
 					bTree.setDebugLevel(Integer.parseInt(args[4]));
-				} catch (Exception e) {
+				} catch (NumberFormateException e) {
 					System.out.println(args[4] + " is not an integer.");
 					useage();
 				}
 			} else if (args[0].equals("1")) {
 				try {
 					bTree.setCacheSize(Integer.parseInt(args[4]));
-				} catch (Exception e) {
+				} catch (NumberFormateException e) {
 					System.out.println(args[4] + " is not an integer.");
 					useage();
 				}
@@ -174,13 +174,13 @@ public class GeneBankCreateBTree {
 			if (args[0].equals("1")) {
 				try {
 					bTree.setCacheSize(Integer.parseInt(args[4]));
-				} catch (Exception e) {
+				} catch (NumberFormateException e) {
 					System.out.println(args[4] + " is not an integer.");
 					useage();
 				}
 				try {
 					bTree.setDebugLevel(Integer.parseInt(args[5]));
-				} catch (Exception e) {
+				} catch (NumberFormateException e) {
 					System.out.println(args[5] + " is not an integer.");
 					useage();
 				}
