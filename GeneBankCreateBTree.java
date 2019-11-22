@@ -77,24 +77,29 @@ public class GeneBankCreateBTree {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		GeneBankCreateBTree bTree = new GeneBankCreateBTree();
-
-		if (args.length < 4 || args.length > 6) {
+		int degree = -1;
+		int sequenceLength = 0;
+		try {
+			degree = Integer.parseInt(args[1]);
+		} catch (Exception e) {
+			System.out.println(args[1] + " is not an integer.");
 			useage();
 		}
-
-		boolean useCache = false; // configure using args[0]
-		if (Integer.parseInt(args[0]) == 1) {
-			useCache = true;
+		if (degree == 0) {
+			//need to create algorith to compute this value, using what was provided in class currently
+			degree = 127;
 		}
-		int degree = Integer.parseInt(args[1]); // set degree from args[1]
-
-		// String fileName = "test3.gbk";
 		String fileName = args[2];
-		// I can't get it to recognize the filename if I pass it in as args[2].
-		// I have to hard-code the filename for testing purposes.
-		// This needs to be addressed!
-
-		int sequenceLength = Integer.parseInt(args[3]); // set sequence length from args[3]
+		try {
+			sequenceLength = Integer.parseInt(args[3]);
+		} catch (Exception e) {
+			System.out.println(args[3] + " is not an integer.");
+			useage();
+		}
+		if (sequenceLength < 1 || sequenceLength > 31) {
+			System.out.println("Sequence length must be between 1 and 31 inclusive.");
+			useage();
+		}
 
 		// parse through the gbk file
 		File file = new File(fileName);
@@ -142,9 +147,8 @@ public class GeneBankCreateBTree {
 		if (args.length == 4) {
 			if (args[0].equals("0")) {
 				// no cache
-			} else if (args[0].equals("1")) {
-				// cache -> should be args[4] for cache size
 			} else {
+				System.out.println("Cache option selected, but no cache Size was not provided.");
 				useage();
 			}
 		} else if (args.length == 5) {
@@ -152,12 +156,14 @@ public class GeneBankCreateBTree {
 				try {
 					bTree.setDebugLevel(Integer.parseInt(args[4]));
 				} catch (Exception e) {
+					System.out.println(args[4] + " is not an integer.");
 					useage();
 				}
 			} else if (args[0].equals("1")) {
 				try {
 					bTree.setCacheSize(Integer.parseInt(args[4]));
 				} catch (Exception e) {
+					System.out.println(args[4] + " is not an integer.");
 					useage();
 				}
 			} else {
@@ -168,14 +174,17 @@ public class GeneBankCreateBTree {
 				try {
 					bTree.setCacheSize(Integer.parseInt(args[4]));
 				} catch (Exception e) {
+					System.out.println(args[4] + " is not an integer.");
 					useage();
 				}
 				try {
 					bTree.setDebugLevel(Integer.parseInt(args[5]));
 				} catch (Exception e) {
+					System.out.println(args[5] + " is not an integer.");
 					useage();
 				}
 			} else {
+				System.out.println("Cache option selected, but no cache Size was not provided.");
 				useage();
 			}
 		} else {
