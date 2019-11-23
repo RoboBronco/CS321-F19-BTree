@@ -8,31 +8,24 @@ public class BTreeNode{
     private Long[] objects;
 
     public BTreeNode(int address, int degree){
-        leafNode = true;
+        leafNode = false;
         numObjects = 0;
         locInFile = address;
         children = new int[degree+1];
         objects = new Long[degree];
     }
 
-    public void insertObject(long object){
-        // numObjects ++;
-        // if(objects[0] == null){
-        //     objects[0] = object;
-        // } else {
-        //     int i=0;
-        //     while(i<=numObjects){
-        //         if(objects[i].equals(object)){
-        //             objects[i].incrementFrequency();
-        //             break;
-        //         } else if (objects[i].getData < object)
-        //     }
-        // }
-        // need to figure out how to order objects and int-pointers... array?
+    public void insertObject(long object, int index){ // this might be done in BTree class...
+        numObjects ++;
+        objects[index] = object;
     }
 
     public Boolean isLeaf(){
         return leafNode;
+    }
+
+    public void setLeaf(boolean leafStatus){
+        leafNode = leafStatus;
     }
 
     public void setParent(int parentLocation){
