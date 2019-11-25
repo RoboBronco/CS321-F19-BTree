@@ -1,14 +1,20 @@
+import java.io.RandomAccessFile;
+
 public class BTree{
     private int root;
     private int degree;
-    private int k;
+    private int seqLength;
+    private RandomAccessFile raf;
 
-    public BTree(int degreeT){
+    public BTree(String fileName, int sequenceLength, int degreeT){
         degree = degreeT;
+        seqLength = sequenceLength;
+        String filePath = fileName + ".btree.data." + seqLength + "." + degree;
+        raf = new RandomAccessFile(filePath, "rw");
     }
 
-    public void insert(BTree t, TreeObject treeObj){
-        BTreeNode r = BTreeNode.getNode(root); //
+    public void insert(BTree t, TreeObject k){
+        BTreeNode r = BTreeNode.getNode(root);
         if (r.numObjects() == (2*degree)-1){
             BTreeNode s = new BTreeNode();
             t.root = s;
@@ -88,5 +94,9 @@ public class BTree{
             BTreeNode childNode = DiskRead(x.children[i]);
             return search(childNode,k);
         }
+    }
+
+    private BTreeNode DiskRead(int nodePointer){
+
     }
 }

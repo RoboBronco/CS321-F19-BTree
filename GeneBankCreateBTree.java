@@ -206,6 +206,8 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
+		// Where is the actual BTree started??
+		// BTree actualBTree = new BTree(String fileName, int sequenceLength, int degreeT)
 
 		// parse through the gbk file
 		File file = bTree.getFile();

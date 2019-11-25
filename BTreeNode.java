@@ -43,6 +43,10 @@ public class BTreeNode{
         return numObjects;
     }
 
+    public int nodeAddress(){
+        return locInFile;
+    }
+
 
     // need disk write method but not sure if it should be in BTree.java or int BTreeNode.java
 }
