@@ -37,6 +37,56 @@ public class BTree{
             x.children[k+1] = x.children[k];
         }
         x.children[i+1] = z;
-        // for(int l = x.numObjects(); )
+        for(int l = x.numObjects(); l > i; i--){
+            x.objects[l+1]=x.objects[l];
+        }
+        x.objects[i] = y.objects[degree];
+        x.incrementNumObjects();
+        y.diskWrite();
+        z.diskWrite();
+        x.diskWrite();
+    }
+
+    public void insertNonFull(BTreeNode x, TreeObject k){
+        int i = x.numObjects();
+        if( x.isLeaf()){
+            while( i>=1 && k.getData()<x.objects[i-1].getData()){
+                x.objects[i] = x.objects[i-1];
+                i --;
+            }
+            x.objects[i] = k;
+            x.incrementNumObjects();
+            x.diskWrite();
+        } else {
+            while( i>=1 && k.getData()<x.objects[i].getData()){
+                i --;
+            }
+            i ++;
+            BTreeNode childNode = DiskRead(x.children[i]); // reads node - a child node of x
+            if( childNode.numObjects() == (2*degree)+1){
+                splitChild(x,i,childNode);
+                if( k.getData()>x.objects[i].getData()){
+                    i ++;
+                }
+            }
+            insertNonFull(childNode, k);
+        }
+    }
+
+    public Boolean search(BTreeNode x, BTreeObject k){
+        int i = 1;
+        while( i<=x.numObjects() && k.getData()>x.objects[i].getData()){
+            i ++;
+        }
+        if( i<=x.numObjects() && k.equals(x.objects[i])){
+            return true;
+        }
+        if( x.isLeaf()){
+            System.out.println("Data not found");
+            return false;
+        } else {
+            BTreeNode childNode = DiskRead(x.children[i]);
+            return search(childNode,k);
+        }
     }
 }

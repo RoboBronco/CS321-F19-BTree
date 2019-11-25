@@ -2,6 +2,7 @@ public class BTreeNode{
 
     private Boolean leafNode;
     private int numObjects;
+    private int numChildren;
     private int locInFile;
     private int parentNode;
     private int[] children;
@@ -10,6 +11,7 @@ public class BTreeNode{
     public BTreeNode(int address, int degree){
         leafNode = false;
         numObjects = 0;
+        numChildren = 0;
         locInFile = address;
         children = new int[degree+1];
         objects = new Long[degree];
@@ -22,6 +24,7 @@ public class BTreeNode{
 
     public Boolean isLeaf(){
         return leafNode;
+        // return if(children[0] == null);
     }
 
     public void setLeaf(boolean leafStatus){
@@ -32,9 +35,14 @@ public class BTreeNode{
         parentNode = parentLocation;
     }
 
+    public void incrementNumObjects(){
+        numObjects ++;
+    }
+
     public int numObjects(){
         return numObjects;
     }
 
-    
+
+    // need disk write method but not sure if it should be in BTree.java or int BTreeNode.java
 }
