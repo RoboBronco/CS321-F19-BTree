@@ -31,8 +31,8 @@ public class BTree{
         BTreeNode z = new BTreeNode(degree);
         z.setLeaf(y.isLeaf());
         // z.count = degree-1
-        for (int i = 0; i < degree-1; i++){
-            z.insertObject(y.objects[i+degree], i);
+        for (int h = 0; h < degree-1; h++){
+            z.insertObject(y.objects[h+degree], h);
         }
         if(!y.isLeaf()){
             for(int j = 0; j < degree; j++){
