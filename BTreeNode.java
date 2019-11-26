@@ -1,30 +1,65 @@
+import java.io.RandomAccessFile;
+
 public class BTreeNode{
 
     private Boolean leafNode;
-    // private int nodeSize;
+    private int metaDataSize; // 
+    private int nodeSize;
     private int numObjects;
-    // private int numChildren;
     private int locInFile; //byte offset in file
     private int parentNode; // byte offset in file
-    private int[] children; // each is a byte offset in file
-    private Long[] objects; // keys/objects stored in each node
+    private int nodeDegree;
+    public int[] children; // each is address in file of child nodes
+    public TreeObject[] objects; // keys/objects stored in each node
 
     // When do we set the node size and keep track of where new nodes go?
     // Basically MetaData + Objects + Keys = Node Size (in bytes)... but when is that calculated? When a node is created?
 
     public BTreeNode(int address, int degree){
-        // nodeSize = metaDataSize + ((2*degree -1)*8) + ((2*degree)*4);
         leafNode = false;
+        // metaDataSize will be hardcoded when code is functional and finalized
+        metaDataSize = 1 + 4 + 4 + 4 + 4 + 4;
+        nodeSize = metaDataSize + ((2*degree -1)*(8+4+4)) + ((2*degree)*4); 
         numObjects = 0;
-        // numChildren = 0;
         locInFile = address;
+        parentNode = 0;
+        nodeDegree = degree;
         children = new int[degree+1];
-        objects = new Long[degree];
+        objects = new TreeObject[degree];
     }
 
-    public void insertObject(long object, int index){ // this might be done in BTree class...
-        numObjects ++;
-        objects[index] = object;
+    public BTreeNode readBTreeNode(RandomAccessFile file, int nodeAddress){ // Not sure how to get this to return a BTreeNode...
+        RandomAccessFile raf = file;
+        raf.seek(nodeAddress);
+
+        leafNode = raf.readBoolean();
+        metaDataSize = raf.readInt();
+        nodeSize = raf.readInt();
+        numObjects = raf.readInt();
+        locInFile = raf.readInt();
+        parentNode = raf.readInt();
+        nodeDegree = raf.readInt();
+        if(leafNode){
+            for (int i=0; i<numObjects+1; i++){
+                children[i] = raf.readInt();
+            }
+        }
+        raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
+        for (int j=0; j<numObjects; j++){
+            objects[j].setData(raf.readLong());
+            objects[j].setFrequency(raf.readInt());
+            objects[j].setSequenceLength(raf.readInt());
+        }
+
+    }
+
+    public void insertObject(TreeObject object, int index){ // this might be done in BTree class...
+        if (objects[index] == null){
+            numObjects ++;
+            objects[index] = object;
+        } else if (objects[index].equals(object)){
+            objects[index].incrementFrequency();
+        }
     }
 
     public Boolean isLeaf(){
@@ -52,6 +87,44 @@ public class BTreeNode{
         return locInFile;
     }
 
+    public int nodeSize(){
+        return nodeSize;
+    }
+
+    public void writeToFile(RandomAccessFile file){
+        RandomAccessFile raf = file;
+        raf.seek(locInFile);
+
+        raf.writeBoolean(leafNode);
+        raf.writeInt(metaDataSize);
+        raf.writeInt(nodeSize);
+        raf.writeInt(numObjects);
+        raf.writeInt(locInFile);
+        raf.writeInt(parentNode);
+        raf.writeInt(nodeDegree);
+        if (leafNode){
+            for (int i=0; i<numObjects+1; i++){
+                raf.writeInt(children[i]);
+                // if (children[i] != null){
+                //     raf.writeInt(children[i]);
+                // }
+            }
+        }
+        raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
+        for (int j=0; j<numObjects; j++){
+            raf.writeLong(objects[j].getData());
+            raf.writeInt(objects[j].getFrequency());
+            raf.writeInt(objects[j].getSequenceLength());
+            // if (objects[j] != null){
+            //     raf.writeLong(objects[j].getData());
+            //     raf.writeInt(objects[j].getFrequency());
+            //     raf.writeInt(objects[j].getSequenceLength());
+            // }
+        }
+    }
+
+    
+    
 
     // need disk write method but not sure if it should be in BTree.java or int BTreeNode.java
 }
