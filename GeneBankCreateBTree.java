@@ -6,6 +6,7 @@ public class GeneBankCreateBTree {
 	public int degree, sequenceLength, cacheSize;
 	public File fileName;
 	public String fileString;
+	public BTree bTree;
 
 	public int getDegree() {
 		return this.degree;
@@ -27,6 +28,14 @@ public class GeneBankCreateBTree {
 		return this.fileString;
 	}
 
+	public BTree getBTree() {
+		return this.bTree;
+	}
+
+	public int optimalDegree(int degree) {
+		return 127;
+	}
+
 	public void check(String degree, String fileName, String sequenceLength) {
 		try {
 			this.degree = Integer.parseInt(degree);
@@ -37,7 +46,7 @@ public class GeneBankCreateBTree {
 		if (this.degree < 0)
 			useage();
 		else if (this.degree == 0)
-			this.degree = 127;
+			this.degree = optimalDegree(this.degree);
 		if (this.sequenceLength < 1 || this.sequenceLength > 31)
 			useage();
 		this.fileString = fileName;
@@ -47,7 +56,7 @@ public class GeneBankCreateBTree {
 	}
 
 	//constructor with cache and debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize, String debugLevel) {
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize, String debugLevel) throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
 		if (!cache.equals("1")) {
 			useage();
@@ -66,9 +75,10 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
+		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree());
 	}
 	//constructor with cache or debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSizeOrDebug) {
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSizeOrDebug) throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
 		if (cache.equals("0")) {	
 			if (cacheSizeOrDebug.equals("0")) {
@@ -89,13 +99,15 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
+		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree());
 	}
 	//constructor without cache or debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength) {
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength) throws FileNotFoundException {
+		check(degree, fileName, sequenceLength);
 		if (!cache.equals("0")) {
 			useage();
 		}
-		check(degree, fileName, sequenceLength);
+		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree());
 	}
 
 	public static void useage() {
@@ -157,9 +169,9 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
-		BTree bTree = new BTree(geneBank.getFileString(), geneBank.getSequenceLength(), geneBank.getDegree());
 		// Where is the actual BTree started??
 		// BTree actualBTree = new BTree(String fileName, int sequenceLength, int degreeT)
+		// BTree is created in the GeneBankConstructor, you can call the it with the getBTree() method
 
 		// parse through the gbk file
 		File file = geneBank.getFile();
