@@ -22,67 +22,49 @@ public class GeneBankCreateBTree {
 		return this.cacheSize;
 	}
 
+	public void check(String degree, String fileName, String sequenceLength) {
+		try {
+			this.degree = Integer.parseInt(degree);
+			this.sequenceLength = Integer.parseInt(sequenceLength);
+		} catch (Exception e) {
+			useage();
+		}
+		if (this.degree < 0)
+			useage();
+		else if (this.degree == 0)
+			this.degree = 127;
+		if (this.sequenceLength < 1 || this.sequenceLength > 31)
+			useage();
+		this.fileName = new File(fileName);
+		if(!this.fileName.exists() || this.fileName.isDirectory()) 
+			useage();
+	}
+
 	//constructor with cache and debug
 	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize, String debugLevel) {
-		if (cache.equals("1")) {
-			this.fileName = new File(fileName);
-			try {
-				this.degree = Integer.parseInt(degree);
-				this.sequenceLength = Integer.parseInt(sequenceLength);
-				this.cacheSize = Integer.parseInt(cacheSize);
-			} catch (Exception e) {
-				useage();
-			}
-			if (this.degree == 0) {
-				//calculate the optimal degree
-				//temporary value below
-				this.degree = 127;
-			} else if (this.degree < 0) {
-				useage();
-			}
-			if(!this.fileName.exists() || this.fileName.isDirectory()) { 
-				useage();
-			}
-			if (this.sequenceLength < 1 || this.sequenceLength > 31) {
-				useage();
-			}
-			if (this.cacheSize < 1) {
-				useage();
-			}
-			if (debugLevel.equals("0")) {
-				//debug level 0
-			} else if (debugLevel.equals("1")) {
-				//debug level 1, dump file
-			} else {
-				useage();
-			}
+		check(degree, fileName, sequenceLength);
+		if (!cache.equals("1")) {
+			useage();
+		}
+		try {
+			this.cacheSize = Integer.parseInt(cacheSize);
+			if (this.cacheSize < 1)
+			useage();
+		} catch (Exception e) {
+			useage();
+		}
+		if (debugLevel.equals("0")) {
+			//debug level 0
+		} else if (debugLevel.equals("1")) {
+			//debug level 1, dump file
 		} else {
 			useage();
 		}
 	}
 	//constructor with cache or debug
 	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSizeOrDebug) {
-		if (cache.equals("0")) {
-			this.fileName = new File(fileName);
-			try {
-				this.degree = Integer.parseInt(degree);
-				this.sequenceLength = Integer.parseInt(sequenceLength);
-			} catch (Exception e) {
-				useage();
-			}
-			if (this.degree == 0) {
-				//calculate the optimal degree
-				//temporary value below
-				this.degree = 127;
-			} else if (this.degree < 0) {
-				useage();
-			}
-			if(!this.fileName.exists() || this.fileName.isDirectory()) { 
-				useage();
-			}
-			if (this.sequenceLength < 1 || this.sequenceLength > 31) {
-				useage();
-			}
+		check(degree, fileName, sequenceLength);
+		if (cache.equals("0")) {	
 			if (cacheSizeOrDebug.equals("0")) {
 				//debug level 0
 			} else if (cacheSizeOrDebug.equals("1")) {
@@ -91,28 +73,11 @@ public class GeneBankCreateBTree {
 				useage();
 			}
 		} else if (cache.equals("1")) {
-			this.fileName = new File(fileName);
 			try {
-				this.degree = Integer.parseInt(degree);
-				this.sequenceLength = Integer.parseInt(sequenceLength);
 				this.cacheSize = Integer.parseInt(cacheSizeOrDebug);
+				if (this.cacheSize < 1)
+					useage();
 			} catch (Exception e) {
-				useage();
-			}
-			if (this.degree == 0) {
-				//calculate the optimal degree
-				//temporary value below
-				this.degree = 127;
-			} else if (this.degree < 0) {
-				useage();
-			}
-			if(!this.fileName.exists() || this.fileName.isDirectory()) { 
-				useage();
-			}
-			if (this.sequenceLength < 1 || this.sequenceLength > 31) {
-				useage();
-			}
-			if (this.cacheSize < 1) {
 				useage();
 			}
 		} else {
@@ -121,30 +86,10 @@ public class GeneBankCreateBTree {
 	}
 	//constructor without cache or debug
 	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength) {
-		if (cache.equals("0")) {
-			this.fileName = new File(fileName);
-			try {
-				this.degree = Integer.parseInt(degree);
-				this.sequenceLength = Integer.parseInt(sequenceLength);
-			} catch (Exception e) {
-				useage();
-			}
-			if (this.degree == 0) {
-				//calculate the optimal degree
-				//temporary value below
-				this.degree = 127;
-			} else if (this.degree < 0) {
-				useage();
-			}
-			if(!this.fileName.exists() || this.fileName.isDirectory()) { 
-				useage();
-			}
-			if (this.sequenceLength < 1 || this.sequenceLength > 31) {
-				useage();
-			}
-		} else {
+		if (!cache.equals("0")) {
 			useage();
 		}
+		check(degree, fileName, sequenceLength);
 	}
 
 	public static void useage() {
