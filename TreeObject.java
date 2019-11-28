@@ -59,13 +59,13 @@ public class TreeObject{
         }
         String stringACGT = "";
         for (int j=0; j<binaryString.length()-1; j+=2){
-            if (binaryString.subSequence(j,j+1) == "00"){
+            if (binaryString.subSequence(j,j+2).equals("00")){
                 stringACGT += "a";
-            } else if (binaryString.subSequence(j,j+1) == "01"){
+            } else if (binaryString.subSequence(j,j+2).equals("01")){
                 stringACGT += "c";
-            } else if (binaryString.subSequence(j,j+1) == "10"){
+            } else if (binaryString.subSequence(j,j+2).equals("10")){
                 stringACGT += "g";
-            } else if (binaryString.subSequence(j,j+1) == "11"){
+            } else if (binaryString.subSequence(j,j+2).equals("11")){
                 stringACGT += "t";
             }
         }

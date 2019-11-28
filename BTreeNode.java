@@ -17,7 +17,6 @@ public class BTreeNode{
 
     public BTreeNode(int address, int degree){
         leafNode = false;
-        // metaDataSize will be hardcoded when code is functional and finalized
         metaDataSize = 1 + 4 + 4 + 4 + 4 + 4;
         nodeSize = metaDataSize + ((2*degree -1)*(8+4+4)) + ((2*degree)*4); 
         numObjects = 0;
@@ -28,9 +27,9 @@ public class BTreeNode{
         objects = new TreeObject[degree];
     }
 
-    public BTreeNode readBTreeNode(RandomAccessFile file, int nodeAddress){ // Not sure how to get this to return a BTreeNode...
+    public BTreeNode(int address, int degree, RandomAccessFile file){ // Not sure how to get this to return a BTreeNode...
         RandomAccessFile raf = file;
-        raf.seek(nodeAddress);
+        raf.seek(address);
 
         leafNode = raf.readBoolean();
         metaDataSize = raf.readInt();
@@ -39,6 +38,8 @@ public class BTreeNode{
         locInFile = raf.readInt();
         parentNode = raf.readInt();
         nodeDegree = raf.readInt();
+        children = new int[degree+1];
+        objects = new TreeObject[degree];
         if(leafNode){
             for (int i=0; i<numObjects+1; i++){
                 children[i] = raf.readInt();
@@ -50,7 +51,7 @@ public class BTreeNode{
             objects[j].setFrequency(raf.readInt());
             objects[j].setSequenceLength(raf.readInt());
         }
-
+        raf.close();
     }
 
     public void insertObject(TreeObject object, int index){ // this might be done in BTree class...
@@ -121,10 +122,6 @@ public class BTreeNode{
             //     raf.writeInt(objects[j].getSequenceLength());
             // }
         }
+        raf.close();
     }
-
-    
-    
-
-    // need disk write method but not sure if it should be in BTree.java or int BTreeNode.java
 }

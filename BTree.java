@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 
 public class BTree{
@@ -8,7 +9,7 @@ public class BTree{
     private int nodeSize;
     private RandomAccessFile raf;
 
-    public BTree(String fileName, int sequenceLength, int degreeT){
+    public BTree(String fileName, int sequenceLength, int degreeT)throws FileNotFoundException{
         degree = degreeT;
         seqLength = sequenceLength;
         String filePath = fileName + ".btree.data." + seqLength + "." + degree;
@@ -77,7 +78,7 @@ public class BTree{
                 i --;
             }
             i ++;
-            BTreeNode childNode = BTreeNode(raf, x.children[i]); // reads node - a child node of x
+            BTreeNode childNode = new BTreeNode(x.children[i], degree, raf); // reads node - a child node of x
             if( childNode.numObjects() == (2*degree)+1){
                 splitChild(x,i,childNode);
                 if( k.getData()>x.objects[i].getData()){
@@ -100,7 +101,7 @@ public class BTree{
             System.out.println("Data not found");
             return false;
         } else {
-            BTreeNode childNode = BTreeNode(raf, x.children[i]);
+            BTreeNode childNode = new BTreeNode(x.children[i], degree, raf);
             return search(childNode,k);
         }
     }
