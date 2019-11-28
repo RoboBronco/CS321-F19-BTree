@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class BTree{
@@ -40,32 +41,37 @@ public class BTree{
         BTreeNode z = new BTreeNode(nextNodeAddress, degree);
         nextNodeAddress += nodeSize;
         z.setLeaf(y.isLeaf());
-        // z.count = degree-1
+        z.setNumObjects(degree-1);
         for (int h = 0; h < degree-1; h++){
-            z.insertObject(y.objects[h+degree], h);
+            z.insertObject(y.relocateObject(h+degree), h);
         }
         if(!y.isLeaf()){
             for(int j = 0; j < degree; j++){
-                z.children[j] = y.children[j+degree];
+                z.children[j] = y.relocateChild(j+degree);
             }
         }
-        for(int k = x.numObjects() ; k>i ; k--){ // pay attention to index locations here, may be off by 1
+        y.setNumObjects(degree-1);
+        for(int k = x.numObjects() ; k>i ; k--){ 
             x.children[k+1] = x.children[k];
         }
-        x.children[i+1] = z.nodeAddress();
-        for(int l = x.numObjects(); l > i; i--){
-            x.objects[l+1]=x.objects[l];
+        x.children[i] = z.nodeAddress();
+        for(int m = x.numObjects(); m > i; m--){
+            x.objects[m+1]=x.objects[m];
         }
-        x.objects[i] = y.objects[degree];
+        x.objects[i] = y.relocateObject(degree);
         x.incrementNumObjects();
+        System.out.println("y numObjects() = " + y.numObjects());
         DiskWrite(y);
+        System.out.println("z numObjects() = " + z.numObjects());
         DiskWrite(z);
+        System.out.println("x.numObjects() = " + x.numObjects());
         DiskWrite(x);
-        }
+    }
 
     public void insertNonFull(BTreeNode x, TreeObject k){
         int i = x.numObjects();
-        if( x.isLeaf()){
+        System.out.println("x.numObjects() = " + i);
+        if(x.isLeaf()){
             while( i>=1 && k.getData()<x.objects[i-1].getData()){
                 x.objects[i] = x.objects[i-1];
                 i --;
@@ -74,7 +80,7 @@ public class BTree{
             x.incrementNumObjects();
             DiskWrite(x);
         } else {
-            while( i>=1 && k.getData()<x.objects[i].getData()){
+            while( i>=1 && k.getData()<x.objects[i-1].getData()){
                 i --;
             }
             i ++;
@@ -108,6 +114,14 @@ public class BTree{
 
     private void DiskWrite(BTreeNode writeNode){
         writeNode.writeToFile(raf);
+    }
+
+    public void closeRandomAccessFile(){
+        try{
+            raf.close();
+        } catch(IOException e){
+            System.out.println("Issue closing RandomAccessFile. " + e);
+        }
     }
     
 }
