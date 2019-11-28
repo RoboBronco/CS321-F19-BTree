@@ -46,7 +46,8 @@ public class BTreeNode{
             children = new int[degree*2];
             objects = new TreeObject[degree*2 - 1];
             // if(!leafNode){
-                for (int i=0; i<numObjects+1; i++){
+                // for (int i=0; i<numObjects+1; i++){
+                for (int i=0; i<children.length; i++){
                     children[i] = raf.readInt();
                 }
             // }
@@ -90,12 +91,12 @@ public class BTreeNode{
     }
 
     public Boolean isLeaf(){
-        // return leafNode;
-        if (children[0] < 0){
-            return true;
-        } else {
-            return false;
-        }
+        return leafNode;
+        // if (children[0] < 0){
+        //     return true;
+        // } else {
+        //     return false;
+        // }
     }
 
     public void setLeaf(boolean leafStatus){
@@ -142,14 +143,15 @@ public class BTreeNode{
             raf.writeInt(locInFile);
             raf.writeInt(parentNode);
             raf.writeInt(nodeDegree);
-            if (leafNode){
-                for (int i=0; i<numObjects+1; i++){
+            // if (leafNode){
+                // for (int i=0; i<numObjects+1; i++){
+                for (int i=0; i<children.length; i++){
                     raf.writeInt(children[i]);
                     // if (children[i] != null){
                     //     raf.writeInt(children[i]);
                     // }
                 }
-            }
+            // }
             raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
             for (int j=0; j<numObjects; j++){
                 System.out.println("int: " + j + " = " + objects[j].getData());
