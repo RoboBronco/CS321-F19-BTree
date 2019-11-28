@@ -35,14 +35,22 @@ public class BTreeNode{
         try{
             RandomAccessFile raf = file;
             raf.seek(address);
+            //System.out.print("address:"+address);
 
             leafNode = raf.readBoolean();
+            //System.out.print(" -- leafNode:"+leafNode);
             metaDataSize = raf.readInt();
+            //System.out.print(" -- metaDataSize:"+metaDataSize);
             nodeSize = raf.readInt();
+            //System.out.print(" -- nodeSize:"+nodeSize);
             numObjects = raf.readInt();
+            //System.out.println(" -- numObjects:"+numObjects);
             locInFile = raf.readInt();
+            //System.out.print("locInFile:"+locInFile);
             parentNode = raf.readInt();
+            //System.out.print(" -- parentNode:"+parentNode);
             nodeDegree = raf.readInt();
+            //System.out.println(" -- nodeDegree:"+nodeDegree);
             children = new int[degree*2];
             objects = new TreeObject[degree*2 - 1];
             // if(!leafNode){
@@ -52,7 +60,7 @@ public class BTreeNode{
                 }
             // }
             raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
-            System.out.println("BTreeNode\t numObjects = " + numObjects);
+            System.out.println("BTreeNode_RAF\t numObjects = " + numObjects);
             for (int j=0; j<numObjects; j++){
                 Long reloadData = raf.readLong();
                 int reloadFrequency = raf.readInt();
@@ -92,7 +100,7 @@ public class BTreeNode{
 
     public Boolean isLeaf(){
         return leafNode;
-        // if (children[0] < 0){
+        // if (children[0] <= 0){
         //     return true;
         // } else {
         //     return false;
@@ -105,6 +113,10 @@ public class BTreeNode{
 
     public void setParent(int parentLocation){
         parentNode = parentLocation;
+    }
+
+    public int getParent(){
+        return parentNode;
     }
 
     public void incrementNumObjects(){
@@ -169,4 +181,6 @@ public class BTreeNode{
             System.out.println("Error writing to RandomAccessFile. " + e);
         }
     }
+
+    
 }

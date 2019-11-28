@@ -29,7 +29,7 @@ public class BTree{
             root = s;
             s.setLeaf(false);
             s.children[0] = r.nodeAddress();
-            // r.setParent(s.nodeAddress());
+            r.setParent(s.nodeAddress());
             splitChild(s,0,r);
             insertNonFull(s,k);
         } else {
@@ -44,17 +44,18 @@ public class BTree{
         System.out.println("*Splitting*  ->  y.numObjects() = " + y.numObjects());
         System.out.println("*Splitting*  ->  z.numObjects() = " + z.numObjects());
         z.setLeaf(y.isLeaf());
+        z.setParent(y.getParent());
         z.setNumObjects(degree-1);
         for (int h = 0; h < degree-1; h++){
             z.insertObject(y.relocateObject(h+degree), h);
         }
-        System.out.println("*Splitting***  ->  z.children[0,1,2,3] BEFORE " + z.children[0] +", "+ z.children[1]+", "+z.children[2]+", "+z.children[3]);
+        System.out.println("*Splitting**  ->  z.children[0,1,2,3] BEFORE " + z.children[0] +", "+ z.children[1]+", "+z.children[2]+", "+z.children[3]);
         if(!y.isLeaf()){
             for(int j = 0; j < degree; j++){
                 z.children[j] = y.relocateChild(j+degree);
             }
-            System.out.println("*Splitting***  ->  y.children[0,1,2,3] " + y.children[0] +", "+ y.children[1]+", "+y.children[2]+", "+y.children[3]);
-            System.out.println("*Splitting***  ->  z.children[0,1,2,3] AFTER " + z.children[0] +", "+ z.children[1]+", "+z.children[2]+", "+z.children[3]);
+            System.out.println("*Splitting**  ->  y.children[0,1,2,3] " + y.children[0] +", "+ y.children[1]+", "+y.children[2]+", "+y.children[3]);
+            System.out.println("*Splitting**  ->  z.children[0,1,2,3] AFTER " + z.children[0] +", "+ z.children[1]+", "+z.children[2]+", "+z.children[3]);
         }
         y.setNumObjects(degree-1);
         for(int k = x.numObjects() ; k > i ; k--){ 
@@ -90,21 +91,23 @@ public class BTree{
             }
             System.out.println(" ");
         }
-        System.out.println("_insertNonFull_ x.isLeaf() = " + x.isLeaf());
-        System.out.println("_insertNonFull_  ->  x.children[0,1,2,3] " + x.children[0] +", "+ x.children[1]+", "+x.children[2]+", "+x.children[3]);
+        System.out.print("_insertNonFull_ x.isLeaf() = " + x.isLeaf()+ "   ");
+        System.out.println("-->  x.children[0,1,2,3] " + x.children[0] +", "+ x.children[1]+", "+x.children[2]+", "+x.children[3]);
         if(x.isLeaf()){
+            System.out.println("k.getData = "+k.getData());
             while( i>=0 && k.getData()<x.objects[i].getData()){
                 x.objects[i+1] = x.objects[i];
                 i --;
             }
-            // x.objects[i] = k;
             System.out.println("_insertNonFull_ Data: " + k.getData() + "   int i+1 = " + (i+1));
             x.insertObject(k,(i+1));
             x.incrementNumObjects();
             DiskWrite(x);
         } else {
             while( i>=0 && k.getData()<x.objects[i].getData()){
+                System.out.println("k_data: "+k.getData()+"  compareTo  x.objects[i]_data: " + x.objects[i].getData());
                 i --;
+                
             }
             i ++;
             System.out.println("_insertNonFull_ int i = " + i);
@@ -112,12 +115,14 @@ public class BTree{
             if(x.children[0] == 0){
                 return;
             }
-            
+            System.out.println("_insertNonFull_ x.children[i]:" + x.children[i]);
             BTreeNode childNode = new BTreeNode(x.children[i], degree, raf); // reads node - a child node of x
             if( childNode.numObjects() == (2*degree)-1){
                 splitChild(x,i,childNode);
                 if( k.getData()>x.objects[i].getData()){
+                    System.out.println("2nd k_data: "+k.getData()+"  compareTo  x.objects[i]_data: " + x.objects[i].getData());
                     i ++;
+                    childNode = new BTreeNode(x.children[i], degree, raf);
                 }
             }
             insertNonFull(childNode, k);
@@ -152,5 +157,24 @@ public class BTree{
             System.out.println("Issue closing RandomAccessFile. " + e);
         }
     }
-    
+
+    public BTreeNode root(){
+        return root;
+    }
+
+    public void printTree(BTreeNode printNode){
+        for(int i=0; i<printNode.numObjects(); i++){
+            // if (!printNode.isLeaf()){
+            if (printNode.children[i] > 0){
+                BTreeNode child = new BTreeNode(printNode.children[i], degree, raf);
+                printTree(child);
+            }
+            System.out.println(printNode.objects[i].getData());
+        }
+        // if (!printNode.isLeaf()){
+        if (printNode.children[printNode.numObjects()] > 0){
+            BTreeNode child = new BTreeNode(printNode.children[printNode.numObjects()], degree, raf);
+            printTree(child);
+        }
+    }
 }
