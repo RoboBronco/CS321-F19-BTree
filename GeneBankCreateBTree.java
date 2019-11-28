@@ -5,13 +5,10 @@ public class GeneBankCreateBTree {
 
 	public int degree, sequenceLength, cacheSize;
 	public File fileName;
+	public String fileString;
 
 	public int getDegree() {
 		return this.degree;
-	}
-
-	public File getFile() {
-		return this.fileName;
 	}
 
 	public int getSequenceLength() {
@@ -20,6 +17,14 @@ public class GeneBankCreateBTree {
 
 	public int getCacheSize() {
 		return this.cacheSize;
+	}
+
+	public File getFile() {
+		return this.fileName;
+	}
+
+	public String getFileString() {
+		return this.fileString;
 	}
 
 	public void check(String degree, String fileName, String sequenceLength) {
@@ -35,6 +40,7 @@ public class GeneBankCreateBTree {
 			this.degree = 127;
 		if (this.sequenceLength < 1 || this.sequenceLength > 31)
 			useage();
+		this.fileString = fileName;
 		this.fileName = new File(fileName);
 		if(!this.fileName.exists() || this.fileName.isDirectory()) 
 			useage();
@@ -141,21 +147,22 @@ public class GeneBankCreateBTree {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
-		GeneBankCreateBTree bTree = null;
+		GeneBankCreateBTree geneBank = null;
 		if (args.length == 4) {
-			bTree = new GeneBankCreateBTree(args[0], args[1], args[2], args[3]);
+			geneBank = new GeneBankCreateBTree(args[0], args[1], args[2], args[3]);
 		} else if (args.length == 5) {
-			bTree = new GeneBankCreateBTree(args[0], args[1], args[2], args[3], args[4]);
+			geneBank = new GeneBankCreateBTree(args[0], args[1], args[2], args[3], args[4]);
 		} else if (args.length == 6) {
-			bTree = new GeneBankCreateBTree(args[0], args[1], args[2], args[3], args[4], args[5]);
+			geneBank = new GeneBankCreateBTree(args[0], args[1], args[2], args[3], args[4], args[5]);
 		} else {
 			useage();
 		}
+		BTree bTree = new BTree(geneBank.getFileString(), geneBank.getSequenceLength(), geneBank.getDegree());
 		// Where is the actual BTree started??
 		// BTree actualBTree = new BTree(String fileName, int sequenceLength, int degreeT)
 
 		// parse through the gbk file
-		File file = bTree.getFile();
+		File file = geneBank.getFile();
 		Scanner scanner = new Scanner(file);
 		String startPt = "ORIGIN";
 		String stopPt = "//";
@@ -187,8 +194,8 @@ public class GeneBankCreateBTree {
 		// break data into moving window groups of sequenceLength size
 		// for(int i=0; i<dataString.length()-sequenceLength; i++){ // for full list of data
 		for (int i = 0; i < 50; i++) { // for testing purposes
-			if (validSequence(dataString, i, bTree.getSequenceLength())) {
-				System.out.println(objectString(dataString, i, bTree.getSequenceLength())); // for testing purposes
+			if (validSequence(dataString, i, geneBank.getSequenceLength())) {
+				System.out.println(objectString(dataString, i, geneBank.getSequenceLength())); // for testing purposes
 				// Build Data Object for Tree and insert into tree
 			}
 		}
