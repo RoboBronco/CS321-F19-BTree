@@ -29,8 +29,8 @@ public class BTree{
             root = s;
             s.setLeaf(false);
             s.children[0] = r.nodeAddress();
-            r.setParent(s.nodeAddress());
-            splitChild(s,1,r);
+            // r.setParent(s.nodeAddress());
+            splitChild(s,0,r);
             insertNonFull(s,k);
         } else {
             insertNonFull(r,k);
@@ -40,26 +40,33 @@ public class BTree{
     public void splitChild(BTreeNode x, int i, BTreeNode y){
         BTreeNode z = new BTreeNode(nextNodeAddress, degree);
         nextNodeAddress += nodeSize;
+        System.out.println("*Splitting*  ->  x.numObjects() = " + x.numObjects());
+        System.out.println("*Splitting*  ->  y.numObjects() = " + y.numObjects());
+        System.out.println("*Splitting*  ->  z.numObjects() = " + z.numObjects());
         z.setLeaf(y.isLeaf());
         z.setNumObjects(degree-1);
         for (int h = 0; h < degree-1; h++){
             z.insertObject(y.relocateObject(h+degree), h);
         }
+        
         if(!y.isLeaf()){
             for(int j = 0; j < degree; j++){
                 z.children[j] = y.relocateChild(j+degree);
             }
         }
         y.setNumObjects(degree-1);
-        for(int k = x.numObjects() ; k>i ; k--){ 
+        for(int k = x.numObjects() ; k > i ; k--){ 
             x.children[k+1] = x.children[k];
         }
-        x.children[i] = z.nodeAddress();
-        for(int m = x.numObjects(); m > i; m--){
+        x.children[i+1] = z.nodeAddress();
+        System.out.println("*Splitting***  ->  int i = " + i);
+        System.out.println("*Splitting***  ->  x.numObjects() " + x.numObjects());
+        for(int m = x.numObjects()-1; m >= i; m--){
             x.objects[m+1]=x.objects[m];
         }
-        x.objects[i] = y.relocateObject(degree);
+        x.objects[i] = y.relocateObject(degree - 1);
         x.incrementNumObjects();
+
         System.out.println("y numObjects() = " + y.numObjects());
         DiskWrite(y);
         System.out.println("z numObjects() = " + z.numObjects());
@@ -69,23 +76,28 @@ public class BTree{
     }
 
     public void insertNonFull(BTreeNode x, TreeObject k){
-        int i = x.numObjects();
-        System.out.println("x.numObjects() = " + i);
+        int i = x.numObjects() - 1;
+        System.out.println("_insertNonFull_ x.numObjects() = " + x.numObjects());
+        System.out.println("_insertNonFull_ x.isLeaf() = " + x.isLeaf());
+        System.out.println("_insertNonFull_ x.children[0] " + x.children[0]);
         if(x.isLeaf()){
-            while( i>=1 && k.getData()<x.objects[i-1].getData()){
-                x.objects[i] = x.objects[i-1];
+            while( i>=0 && k.getData()<x.objects[i].getData()){
+                x.objects[i+1] = x.objects[i];
                 i --;
             }
-            x.objects[i] = k;
+            // x.objects[i] = k;
+            System.out.println("_insertNonFull_ Data: " + k.getData() + "   int i+1 = " + (i+1));
+            x.insertObject(k,(i+1));
             x.incrementNumObjects();
             DiskWrite(x);
         } else {
-            while( i>=1 && k.getData()<x.objects[i-1].getData()){
+            while( i>=0 && k.getData()<x.objects[i].getData()){
                 i --;
             }
             i ++;
+            System.out.println("_insertNonFull_ int i = " + i);
             BTreeNode childNode = new BTreeNode(x.children[i], degree, raf); // reads node - a child node of x
-            if( childNode.numObjects() == (2*degree)+1){
+            if( childNode.numObjects() == (2*degree)-1){
                 splitChild(x,i,childNode);
                 if( k.getData()>x.objects[i].getData()){
                     i ++;

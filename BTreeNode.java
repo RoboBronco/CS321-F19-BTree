@@ -25,7 +25,10 @@ public class BTreeNode{
         parentNode = 0;
         nodeDegree = degree;
         children = new int[degree*2];
-        objects = new TreeObject[degree*2 - 1];
+        for (int i=0; i<degree*2; i++){
+            children[i] = -1;
+        }
+        objects = new TreeObject[(degree*2) - 1];
     }
 
     public BTreeNode(int address, int degree, RandomAccessFile file){ // Not sure how to get this to return a BTreeNode...
@@ -42,16 +45,20 @@ public class BTreeNode{
             nodeDegree = raf.readInt();
             children = new int[degree*2];
             objects = new TreeObject[degree*2 - 1];
-            if(leafNode){
+            // if(!leafNode){
                 for (int i=0; i<numObjects+1; i++){
                     children[i] = raf.readInt();
                 }
-            }
+            // }
             raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
+            System.out.println("BTreeNode\t numObjects = " + numObjects);
             for (int j=0; j<numObjects; j++){
-                objects[j].setData(raf.readLong());
-                objects[j].setFrequency(raf.readInt());
-                objects[j].setSequenceLength(raf.readInt());
+                Long reloadData = raf.readLong();
+                int reloadFrequency = raf.readInt();
+                int reloadSedLen = raf.readInt();
+                TreeObject reloadObj = new TreeObject(reloadData, reloadSedLen);
+                reloadObj.setFrequency(reloadFrequency);
+                objects[j] = reloadObj;
             }
             // raf.close();
         } catch(IOException e) {
@@ -61,29 +68,34 @@ public class BTreeNode{
 
     public void insertObject(TreeObject object, int index){ // this might be done in BTree class...
         if (objects[index] == null){
-            // numObjects ++;
             objects[index] = object;
-        } else if (objects[index].equals(object)){
+        }else if (objects[index].equals(object)){
             objects[index].incrementFrequency();
+        } else {
+            objects[index] = object;
         }
     }
 
     public TreeObject relocateObject(int index){
         TreeObject relocateObj =  objects[index];
         objects[index] = null;
-        numObjects --;
+        // numObjects --;
         return relocateObj;
     }
 
     public int relocateChild(int index){
         int relocateChild = children[index];
-        children[index] = 0;
+        children[index] = -1;
         return relocateChild;
     }
 
     public Boolean isLeaf(){
-        return leafNode;
-        // return if(children[0] == null);
+        // return leafNode;
+        if (children[0] < 0){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void setLeaf(boolean leafStatus){
@@ -140,7 +152,7 @@ public class BTreeNode{
             }
             raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
             for (int j=0; j<numObjects; j++){
-                System.out.println("int: " + j + " = " + objects[j].toStringACGT());
+                System.out.println("int: " + j + " = " + objects[j].getData());
                 raf.writeLong(objects[j].getData());
                 raf.writeInt(objects[j].getFrequency());
                 raf.writeInt(objects[j].getSequenceLength());
