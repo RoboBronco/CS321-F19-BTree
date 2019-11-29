@@ -1,5 +1,6 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 
 public class BTree{
@@ -9,6 +10,7 @@ public class BTree{
     private int nextNodeAddress;
     private int nodeSize;
     private RandomAccessFile raf;
+    private PrintWriter printer1;
 
     public BTree(String fileName, int sequenceLength, int degreeT)throws FileNotFoundException{
         degree = degreeT;
@@ -19,6 +21,7 @@ public class BTree{
         root = new BTreeNode(nextNodeAddress, degree);
         nodeSize = root.nodeSize();
         nextNodeAddress += nodeSize;
+        printer1 = new PrintWriter("dump");
     }
 
     public void insert(TreeObject k){
@@ -104,7 +107,12 @@ public class BTree{
         // System.out.println("-->  x.children[0,1,2,3] " + x.children[0] +", "+ x.children[1]+", "+x.children[2]+", "+x.children[3]);
         if(x.isLeaf()){
             // System.out.println("k.getData = "+k.getData());
-            while( i>=0 && k.getData()<x.objects[i].getData()){
+            while( i>=0 && k.getData()<=x.objects[i].getData()){
+                if (k.equals(x.objects[i])){
+                    x.insertObject(k,i);
+                    DiskWrite(x);
+                    return;
+                }
                 x.objects[i+1] = x.objects[i];
                 i --;
             }
@@ -113,7 +121,12 @@ public class BTree{
             x.incrementNumObjects();
             DiskWrite(x);
         } else {
-            while( i>=0 && k.getData()<x.objects[i].getData()){
+            while( i>=0 && k.getData()<=x.objects[i].getData()){
+                if (k.equals(x.objects[i])){
+                    x.insertObject(k,i);
+                    DiskWrite(x);
+                    return;
+                }
                 // System.out.println("k_data: "+k.getData()+"  compareTo  x.objects[i]_data: " + x.objects[i].getData());
                 i --;
                 
@@ -180,12 +193,33 @@ public class BTree{
                 printTree(child1);
             }
             // System.out.println(printNode.objects[i].getData());
-            System.out.println(printNode.objects[i].toStringACGT());
+            // System.out.println(printNode.objects[i].toStringACGT());
+            System.out.println(printNode.objects[i].getData() + " -- " + printNode.objects[i].toStringACGT());
             i ++;
         }
         if (printNode.children[i] > 0){
             BTreeNode child2 = new BTreeNode(printNode.children[printNode.numObjects()], degree, raf);
             printTree(child2);
         }
+    }
+
+    public void printTreeToFile(BTreeNode printNode){
+        int i = 0;
+        while (i < printNode.numObjects()){
+            if (printNode.children[i] > 0){
+                BTreeNode child1 = new BTreeNode(printNode.children[i], degree, raf);
+                printTreeToFile(child1);
+            }
+            printer1.println(printNode.objects[i].toStringACGT());
+            i ++;
+        }
+        if (printNode.children[i] > 0){
+            BTreeNode child2 = new BTreeNode(printNode.children[printNode.numObjects()], degree, raf);
+            printTreeToFile(child2);
+        }
+    }
+
+    public void closePrinter(){
+        printer1.close();
     }
 }

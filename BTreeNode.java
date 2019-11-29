@@ -145,7 +145,7 @@ public class BTreeNode{
         try{
             RandomAccessFile raf = file;
             raf.seek(locInFile);
-            System.out.println("WriteToFile....Address:"+locInFile);
+            // System.out.println("WriteToFile....Address:"+locInFile);
 
             raf.writeBoolean(leafNode);
             raf.writeInt(metaDataSize);
@@ -166,7 +166,7 @@ public class BTreeNode{
             raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4) + 4);
             // System.out.println("SeekFilePointer before objects[] = " + raf.getFilePointer());
             for (int j=0; j<numObjects; j++){
-                System.out.println("int: " + j + " = " + objects[j].getData());
+                // System.out.println("int: " + j + " = " + objects[j].getData());
                 raf.writeLong(objects[j].getData());
                 raf.writeInt(objects[j].getFrequency());
                 raf.writeInt(objects[j].getSequenceLength());
