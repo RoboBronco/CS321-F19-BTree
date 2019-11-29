@@ -13,9 +13,6 @@ public class BTreeNode{
     public int[] children; // each is address in file of child nodes
     public TreeObject[] objects; // keys/objects stored in each node
 
-    // When do we set the node size and keep track of where new nodes go?
-    // Basically MetaData + Objects + Keys = Node Size (in bytes)... but when is that calculated? When a node is created?
-
     public BTreeNode(int address, int degree){
         leafNode = true;
         metaDataSize = 1 + 4 + 4 + 4 + 4 + 4;
@@ -74,7 +71,7 @@ public class BTreeNode{
         }
     }
 
-    public void insertObject(TreeObject object, int index){ // this might be done in BTree class...
+    public void insertObject(TreeObject object, int index){
         if (objects[index] == null){
             objects[index] = object;
         }else if (objects[index].equals(object)){
@@ -97,12 +94,12 @@ public class BTreeNode{
     }
 
     public Boolean isLeaf(){
-        return leafNode;
-        // if (children[0] <= 0){
-        //     return true;
-        // } else {
-        //     return false;
-        // }
+        //return leafNode;
+        if (children[0] <= 0){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void setLeaf(boolean leafStatus){

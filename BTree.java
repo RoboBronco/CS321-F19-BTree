@@ -26,6 +26,13 @@ public class BTree{
 
     public void insert(TreeObject k){
         BTreeNode r = root;
+        // for( int i=0; i<r.numObjects(); i++){
+        //     if(k.equals(r.objects[i])){
+        //         r.insertObject(k,i);
+        //         DiskWrite(r);
+        //         return;
+        //     }
+        // }
         if (r.numObjects() == (2*degree)-1){
             BTreeNode s = new BTreeNode(nextNodeAddress, degree);
             nextNodeAddress += nodeSize;
@@ -86,33 +93,41 @@ public class BTree{
         // System.out.println("*Splitting_AFTER**  ->  z.children[0,1,2,3] " + z.children[0] +", "+ z.children[1]+", "+z.children[2]+", "+z.children[3]);
 
         // System.out.println("y numObjects() = " + y.numObjects());
-        DiskWrite(y);
         // System.out.println("z numObjects() = " + z.numObjects());
-        DiskWrite(z);
         // System.out.println("x.numObjects() = " + x.numObjects());
+        DiskWrite(y);
+        DiskWrite(z);
         DiskWrite(x);
     }
 
     public void insertNonFull(BTreeNode x, TreeObject k){
+        for( int m=0; m<x.numObjects(); m++){
+            if(k.equals(x.objects[m])){
+                x.insertObject(k,m);
+                DiskWrite(x);
+                return;
+            }
+        }
         int i = x.numObjects() - 1;
         // System.out.println("_insertNonFull_ x.numObjects() = " + x.numObjects());
-        if (x.numObjects() >= 0){
+        // if (x.numObjects() >= 0){
             // System.out.print("_insertNonFull_ x.objects[] = ");
             // for(int d=0; d<x.numObjects(); d++){
             //     System.out.print(x.objects[d].getData()+", ");
             // }
             // System.out.println(" ");
-        }
+        // }
         // System.out.print("_insertNonFull_ x.isLeaf() = " + x.isLeaf()+ "   ");
         // System.out.println("-->  x.children[0,1,2,3] " + x.children[0] +", "+ x.children[1]+", "+x.children[2]+", "+x.children[3]);
         if(x.isLeaf()){
             // System.out.println("k.getData = "+k.getData());
-            while( i>=0 && k.getData()<=x.objects[i].getData()){
-                if (k.equals(x.objects[i])){
-                    x.insertObject(k,i);
-                    DiskWrite(x);
-                    return;
-                }
+            while( i>=0 && k.getData()<x.objects[i].getData()){
+                // if (k.equals(x.objects[i])){
+                //     System.out.println("insertNonFullLeaf_Inserting! "+k.getData()+ "  Frequency before insert: " + x.objects[i].getFrequency());
+                //     x.insertObject(k,i);
+                //     DiskWrite(x);
+                //     return;
+                // }
                 x.objects[i+1] = x.objects[i];
                 i --;
             }
@@ -121,15 +136,15 @@ public class BTree{
             x.incrementNumObjects();
             DiskWrite(x);
         } else {
-            while( i>=0 && k.getData()<=x.objects[i].getData()){
-                if (k.equals(x.objects[i])){
-                    x.insertObject(k,i);
-                    DiskWrite(x);
-                    return;
-                }
+            while( i>=0 && k.getData()<x.objects[i].getData()){
+                // if (k.equals(x.objects[i])){
+                //     System.out.println("insertNonFullNotLeaf_Inserting! "+k.getData()+ "  Frequency before insert: " + x.objects[i].getFrequency());
+                //     x.insertObject(k,i);
+                //     DiskWrite(x);
+                //     return;
+                // }
                 // System.out.println("k_data: "+k.getData()+"  compareTo  x.objects[i]_data: " + x.objects[i].getData());
                 i --;
-                
             }
             i ++;
             // System.out.println("_insertNonFull_ int i = " + i);
