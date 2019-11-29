@@ -40,11 +40,11 @@ public class BTree{
     public void splitChild(BTreeNode x, int i, BTreeNode y){
         BTreeNode z = new BTreeNode(nextNodeAddress, degree);
         nextNodeAddress += nodeSize;
-        System.out.println("*Splitting_BEFORE*  ->  x.numObjects() = " + x.numObjects());
-        System.out.println("*Splitting_BEFORE**  ->  x.children[0,1,2,3] " + x.children[0] +", "+ x.children[1]+", "+x.children[2]+", "+x.children[3]);
-        System.out.println("*Splitting_BEFORE*  ->  y.numObjects() = " + y.numObjects());
-        System.out.println("*Splitting_BEFORE**  ->  y.children[0,1,2,3] " + y.children[0] +", "+ y.children[1]+", "+y.children[2]+", "+y.children[3]);
-        System.out.println("*Splitting_BEFORE*  ->  z.numObjects() = " + z.numObjects());
+        // System.out.println("*Splitting_BEFORE*  ->  x.numObjects() = " + x.numObjects());
+        // System.out.println("*Splitting_BEFORE**  ->  x.children[0,1,2,3] " + x.children[0] +", "+ x.children[1]+", "+x.children[2]+", "+x.children[3]);
+        // System.out.println("*Splitting_BEFORE*  ->  y.numObjects() = " + y.numObjects());
+        // System.out.println("*Splitting_BEFORE**  ->  y.children[0,1,2,3] " + y.children[0] +", "+ y.children[1]+", "+y.children[2]+", "+y.children[3]);
+        // System.out.println("*Splitting_BEFORE*  ->  z.numObjects() = " + z.numObjects());
         z.setLeaf(y.isLeaf());
         z.setParent(y.getParent());
         z.setNumObjects(degree-1);
@@ -75,12 +75,12 @@ public class BTree{
         x.objects[i] = y.relocateObject(degree - 1);
         x.incrementNumObjects();
 
-        System.out.println("*Splitting_AFTER*  ->  x.numObjects() = " + x.numObjects() + "    x.objects[0]: " + x.objects[0].getData());
-        System.out.println("*Splitting_AFTER**  ->  x.children[0,1,2,3] " + x.children[0] +", "+ x.children[1]+", "+x.children[2]+", "+x.children[3]);
-        System.out.println("*Splitting_AFTER*  ->  y.numObjects() = " + y.numObjects() + "    y.objects[0]: " + y.objects[0].getData());
-        System.out.println("*Splitting_AFTER**  ->  y.children[0,1,2,3] " + y.children[0] +", "+ y.children[1]+", "+y.children[2]+", "+y.children[3]);
-        System.out.println("*Splitting_AFTER*  ->  z.numObjects() = " + z.numObjects() + "    z.objects[0]: " + z.objects[0].getData());
-        System.out.println("*Splitting_AFTER**  ->  z.children[0,1,2,3] " + z.children[0] +", "+ z.children[1]+", "+z.children[2]+", "+z.children[3]);
+        // System.out.println("*Splitting_AFTER*  ->  x.numObjects() = " + x.numObjects() + "    x.objects[0]: " + x.objects[0].getData());
+        // System.out.println("*Splitting_AFTER**  ->  x.children[0,1,2,3] " + x.children[0] +", "+ x.children[1]+", "+x.children[2]+", "+x.children[3]);
+        // System.out.println("*Splitting_AFTER*  ->  y.numObjects() = " + y.numObjects() + "    y.objects[0]: " + y.objects[0].getData());
+        // System.out.println("*Splitting_AFTER**  ->  y.children[0,1,2,3] " + y.children[0] +", "+ y.children[1]+", "+y.children[2]+", "+y.children[3]);
+        // System.out.println("*Splitting_AFTER*  ->  z.numObjects() = " + z.numObjects() + "    z.objects[0]: " + z.objects[0].getData());
+        // System.out.println("*Splitting_AFTER**  ->  z.children[0,1,2,3] " + z.children[0] +", "+ z.children[1]+", "+z.children[2]+", "+z.children[3]);
 
         // System.out.println("y numObjects() = " + y.numObjects());
         DiskWrite(y);
@@ -174,12 +174,13 @@ public class BTree{
     public void printTree(BTreeNode printNode){
         int i = 0;
         while (i < printNode.numObjects()){
-            System.out.println("address: " +printNode.nodeAddress() + "   children[] " + printNode.children[0] + ", "+ printNode.children[1] + ", "+ printNode.children[2] + ", "+ printNode.children[3]);
+            // System.out.println("address: " +printNode.nodeAddress() + "   children[] " + printNode.children[0] + ", "+ printNode.children[1] + ", "+ printNode.children[2] + ", "+ printNode.children[3]);
             if (printNode.children[i] > 0){
                 BTreeNode child1 = new BTreeNode(printNode.children[i], degree, raf);
                 printTree(child1);
             }
-            System.out.println(printNode.objects[i].getData());
+            // System.out.println(printNode.objects[i].getData());
+            System.out.println(printNode.objects[i].toStringACGT());
             i ++;
         }
         if (printNode.children[i] > 0){
