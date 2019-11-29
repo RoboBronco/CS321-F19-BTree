@@ -25,9 +25,6 @@ public class BTreeNode{
         parentNode = 0;
         nodeDegree = degree;
         children = new int[degree*2];
-        for (int i=0; i<degree*2; i++){
-            children[i] = -1;
-        }
         objects = new TreeObject[(degree*2) - 1];
     }
 
@@ -35,32 +32,35 @@ public class BTreeNode{
         try{
             RandomAccessFile raf = file;
             raf.seek(address);
-            //System.out.print("address:"+address);
+            System.out.print("address:"+address);
 
             leafNode = raf.readBoolean();
-            //System.out.print(" -- leafNode:"+leafNode);
+            System.out.print(" -- leafNode:"+leafNode);
             metaDataSize = raf.readInt();
-            //System.out.print(" -- metaDataSize:"+metaDataSize);
+            System.out.print(" -- metaDataSize:"+metaDataSize);
             nodeSize = raf.readInt();
-            //System.out.print(" -- nodeSize:"+nodeSize);
+            System.out.print(" -- nodeSize:"+nodeSize);
             numObjects = raf.readInt();
-            //System.out.println(" -- numObjects:"+numObjects);
+            System.out.println(" -- numObjects:"+numObjects);
             locInFile = raf.readInt();
-            //System.out.print("locInFile:"+locInFile);
+            System.out.print("locInFile:"+locInFile);
             parentNode = raf.readInt();
-            //System.out.print(" -- parentNode:"+parentNode);
+            System.out.print(" -- parentNode:"+parentNode);
             nodeDegree = raf.readInt();
-            //System.out.println(" -- nodeDegree:"+nodeDegree);
+            System.out.println(" -- nodeDegree:"+nodeDegree);
             children = new int[degree*2];
             objects = new TreeObject[degree*2 - 1];
-            // if(!leafNode){
-                // for (int i=0; i<numObjects+1; i++){
-                for (int i=0; i<children.length; i++){
-                    children[i] = raf.readInt();
-                }
-            // }
+
+            System.out.println("readFromFile -- children[] ");
+            for (int i=0; i<children.length; i++){
+                System.out.print("ReadingFilePointer = " + raf.getFilePointer() + " ");
+                children[i] = raf.readInt();
+                System.out.println(children[i] + " ");
+            }
+            System.out.println(" ");
+
             raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
-            System.out.println("BTreeNode_RAF\t numObjects = " + numObjects);
+            // System.out.println("BTreeNode_RAF\t numObjects = " + numObjects);
             for (int j=0; j<numObjects; j++){
                 Long reloadData = raf.readLong();
                 int reloadFrequency = raf.readInt();
@@ -69,7 +69,6 @@ public class BTreeNode{
                 reloadObj.setFrequency(reloadFrequency);
                 objects[j] = reloadObj;
             }
-            // raf.close();
         } catch(IOException e) {
             System.out.println("Error reading from RandomAccessFile. " + e);
         }
@@ -88,7 +87,6 @@ public class BTreeNode{
     public TreeObject relocateObject(int index){
         TreeObject relocateObj =  objects[index];
         objects[index] = null;
-        // numObjects --;
         return relocateObj;
     }
 
@@ -147,6 +145,7 @@ public class BTreeNode{
         try{
             RandomAccessFile raf = file;
             raf.seek(locInFile);
+            System.out.println("WriteToFile....Address:"+locInFile);
 
             raf.writeBoolean(leafNode);
             raf.writeInt(metaDataSize);
@@ -155,28 +154,25 @@ public class BTreeNode{
             raf.writeInt(locInFile);
             raf.writeInt(parentNode);
             raf.writeInt(nodeDegree);
-            // if (leafNode){
-                // for (int i=0; i<numObjects+1; i++){
-                for (int i=0; i<children.length; i++){
-                    raf.writeInt(children[i]);
-                    // if (children[i] != null){
-                    //     raf.writeInt(children[i]);
-                    // }
-                }
-            // }
+            
+            System.out.println("children.length: " + children.length);
+            
+            for (int i=0; i<children.length; i++){
+                System.out.println("WritingFilePointer = " + raf.getFilePointer());
+                raf.writeInt(children[i]);
+                System.out.println("writeInt(children[i]) " + children[i]);
+            }
+            
+            raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
             raf.seek(locInFile + metaDataSize + ((2*nodeDegree)*4));
             for (int j=0; j<numObjects; j++){
                 System.out.println("int: " + j + " = " + objects[j].getData());
                 raf.writeLong(objects[j].getData());
                 raf.writeInt(objects[j].getFrequency());
                 raf.writeInt(objects[j].getSequenceLength());
-                // if (objects[j] != null){
-                //     raf.writeLong(objects[j].getData());
-                //     raf.writeInt(objects[j].getFrequency());
-                //     raf.writeInt(objects[j].getSequenceLength());
-                // }
             }
-            // raf.close();
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            
         }catch(IOException e){
             System.out.println("Error writing to RandomAccessFile. " + e);
         }
