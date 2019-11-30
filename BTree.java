@@ -26,13 +26,13 @@ public class BTree{
 
     public void insert(TreeObject k){
         BTreeNode r = root;
-        // for( int i=0; i<r.numObjects(); i++){
-        //     if(k.equals(r.objects[i])){
-        //         r.insertObject(k,i);
-        //         DiskWrite(r);
-        //         return;
-        //     }
-        // }
+        for( int i=0; i<r.numObjects(); i++){
+            if(k.equals(r.objects[i])){
+                r.insertObject(k,i);
+                DiskWrite(r);
+                return;
+            }
+        }
         if (r.numObjects() == (2*degree)-1){
             BTreeNode s = new BTreeNode(nextNodeAddress, degree);
             nextNodeAddress += nodeSize;
@@ -154,6 +154,13 @@ public class BTree{
             }
             // System.out.println("_insertNonFull_ x.children[i]:" + x.children[i]);
             BTreeNode childNode = new BTreeNode(x.children[i], degree, raf); // reads node - a child node of x
+            for( int n=0; n<childNode.numObjects(); n++){
+                if(k.equals(childNode.objects[n])){
+                    childNode.objects[n].incrementFrequency();
+                    DiskWrite(childNode);
+                    return;
+                }
+            }
             if( childNode.numObjects() == (2*degree)-1){
                 splitChild(x,i,childNode);
                 if( k.getData()>x.objects[i].getData()){

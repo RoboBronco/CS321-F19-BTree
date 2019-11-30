@@ -169,11 +169,10 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
-		// Where is the actual BTree started??
-		// BTree actualBTree = new BTree(String fileName, int sequenceLength, int degreeT)
-		// BTree is created in the GeneBankConstructor, you can call the it with the getBTree() method
-
+		
 		// parse through the gbk file
+		BTree workingBTree = geneBank.getBTree();
+		int seqLength = geneBank.getSequenceLength();
 		File file = geneBank.getFile();
 		Scanner scanner = new Scanner(file);
 		String startPt = "ORIGIN";
@@ -182,37 +181,50 @@ public class GeneBankCreateBTree {
 		Boolean foundStartPt = false;
 		Boolean foundStopPt = false;
 
-		while (!foundStartPt) {
-			if (scanner.hasNext()) {
-				String fileString = scanner.next();
-				if (fileString.equals(startPt)) {
-					foundStartPt = true;
+		while (scanner.hasNext()){
+			while (!foundStartPt) {
+				if (scanner.hasNext()) {
+					String fileString = scanner.next();
+					if (fileString.equals(startPt)) {
+						foundStartPt = true;
+					}
 				}
 			}
-		}
-		while (!foundStopPt && foundStartPt) {
-			if (scanner.hasNext()) {
-				String fileString = scanner.next();
-				if (fileString.equals(stopPt)) {
-					foundStopPt = true;
-					break;
-				}
-				if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
-						|| fileString.startsWith("t") || fileString.startsWith("n")) {
-					dataString += fileString;
+			while (!foundStopPt && foundStartPt) {
+				if (scanner.hasNext()) {
+					String fileString = scanner.next();
+					if (fileString.equals(stopPt)) {
+						foundStopPt = true;
+						break;
+					}
+					if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
+							|| fileString.startsWith("t") || fileString.startsWith("n")) {
+						dataString += fileString;
+					}
 				}
 			}
-		}
+			foundStartPt = false;
+            foundStopPt = false;
+            dataString += "n";
+        }
+
+
 		// break data into moving window groups of sequenceLength size
-		// for(int i=0; i<dataString.length()-sequenceLength; i++){ // for full list of data
-		for (int i = 0; i < 50; i++) { // for testing purposes
-			if (validSequence(dataString, i, geneBank.getSequenceLength())) {
-				System.out.println(objectString(dataString, i, geneBank.getSequenceLength())); // for testing purposes
+		for(int i=0; i<dataString.length()-seqLength; i++){ // for full list of data
+		// for (int i = 0; i < 50; i++) { // for testing purposes
+			if (validSequence(dataString, i, seqLength)) {
+				// System.out.println(objectString(dataString, i, geneBank.getSequenceLength())); // for testing purposes
 				// Build Data Object for Tree and insert into tree
+				Long newData = stringToLong(objectString(dataString, i, seqLength));
+				TreeObject newObject = new TreeObject(newData, seqLength);
+				workingBTree.insert(newObject);
+				
 			}
 		}
-		// System.out.println(dataString);
+		// For DEBUG -> if debug level = 1 then call workingBTree.printTreeToFile(workingBTree.root());
 		// System.out.println(dataString.length());
 		scanner.close();
+		workingBTree.closePrinter();
+		workingBTree.closeRandomSccessFile();
 	}
 }
