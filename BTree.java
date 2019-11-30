@@ -4,10 +4,10 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 
 public class BTree{
-    private BTreeNode root;
     private int degree;
     private int seqLength;
     private int nextNodeAddress;
+    private BTreeNode root;
     private int nodeSize;
     private RandomAccessFile raf;
     private PrintWriter printer1;
@@ -15,9 +15,10 @@ public class BTree{
     public BTree(String fileName, int sequenceLength, int degreeT)throws FileNotFoundException{
         degree = degreeT;
         seqLength = sequenceLength;
+        // nextNodeAddress = nodeSize + 4 + 4 + 4 + 4 + rafSize + pwSize; // Temporary value that is intended to be the MetaData size of the BTree
+        nextNodeAddress = 112;
         String filePath = fileName + ".btree.data." + seqLength + "." + degree;
         raf = new RandomAccessFile(filePath, "rw");
-        nextNodeAddress = 56; // Temporary value that is intended to be the MetaData size of the BTree
         root = new BTreeNode(nextNodeAddress, degree);
         nodeSize = root.nodeSize();
         nextNodeAddress += nodeSize;
@@ -28,8 +29,9 @@ public class BTree{
         BTreeNode r = root;
         for( int i=0; i<r.numObjects(); i++){
             if(k.equals(r.objects[i])){
-                r.insertObject(k,i);
-                DiskWrite(r);
+                r.objects[i].incrementFrequency();
+                // r.insertObject(k,i);
+                // DiskWrite(r);
                 return;
             }
         }
@@ -103,7 +105,8 @@ public class BTree{
     public void insertNonFull(BTreeNode x, TreeObject k){
         for( int m=0; m<x.numObjects(); m++){
             if(k.equals(x.objects[m])){
-                x.insertObject(k,m);
+                x.objects[m].incrementFrequency();
+                // x.insertObject(k,m);
                 DiskWrite(x);
                 return;
             }
@@ -174,11 +177,11 @@ public class BTree{
     }
 
     public Boolean search(BTreeNode x, TreeObject k){
-        int i = 1;
-        while( i<=x.numObjects() && k.getData()>x.objects[i].getData()){
+        int i = 0;
+        while( i<x.numObjects() && k.getData()>x.objects[i].getData()){
             i ++;
         }
-        if( i<=x.numObjects() && k.equals(x.objects[i])){
+        if( i<x.numObjects() && k.equals(x.objects[i])){
             return true;
         }
         if( x.isLeaf()){
@@ -190,7 +193,7 @@ public class BTree{
         }
     }
 
-    private void DiskWrite(BTreeNode writeNode){
+    public void DiskWrite(BTreeNode writeNode){
         writeNode.writeToFile(raf);
     }
 

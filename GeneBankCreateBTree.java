@@ -207,24 +207,22 @@ public class GeneBankCreateBTree {
             foundStopPt = false;
             dataString += "n";
         }
-
-
 		// break data into moving window groups of sequenceLength size
 		for(int i=0; i<dataString.length()-seqLength; i++){ // for full list of data
 		// for (int i = 0; i < 50; i++) { // for testing purposes
 			if (validSequence(dataString, i, seqLength)) {
-				// System.out.println(objectString(dataString, i, geneBank.getSequenceLength())); // for testing purposes
-				// Build Data Object for Tree and insert into tree
 				Long newData = stringToLong(objectString(dataString, i, seqLength));
 				TreeObject newObject = new TreeObject(newData, seqLength);
 				workingBTree.insert(newObject);
 				
 			}
 		}
+
 		// For DEBUG -> if debug level = 1 then call workingBTree.printTreeToFile(workingBTree.root());
-		// System.out.println(dataString.length());
+
 		scanner.close();
+		workingBTree.DiskWrite(workingBTree.root());
 		workingBTree.closePrinter();
-		workingBTree.closeRandomSccessFile();
+		workingBTree.closeRandomAccessFile();
 	}
 }
