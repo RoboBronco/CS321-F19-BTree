@@ -182,26 +182,23 @@ public class GeneBankCreateBTree {
 		Boolean foundStartPt = false;
 		Boolean foundStopPt = false;
 
-		while (!foundStartPt) {
-			if (scanner.hasNext()) {
-				String fileString = scanner.next();
-				if (fileString.equals(startPt)) {
-					foundStartPt = true;
-				}
-			}
-		}
-		while (!foundStopPt && foundStartPt) {
-			if (scanner.hasNext()) {
-				String fileString = scanner.next();
+		while (scanner.hasNext()) {
+			String fileString = scanner.next();
+			if (fileString.equals(startPt))
+				foundStartPt = true;
+			while (foundStartPt && !foundStopPt) {
 				if (fileString.equals(stopPt)) {
 					foundStopPt = true;
-					break;
-				}
-				if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
-						|| fileString.startsWith("t") || fileString.startsWith("n")) {
-					dataString += fileString;
+					dataString += "n";
+				} else {
+					fileString = scanner.next();
+					if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g") || fileString.startsWith("t") || fileString.startsWith("n")) {
+						dataString += fileString;
+					}
 				}
 			}
+			foundStartPt = false;
+			foundStopPt = false;
 		}
 		// break data into moving window groups of sequenceLength size
 		// for(int i=0; i<dataString.length()-sequenceLength; i++){ // for full list of data
