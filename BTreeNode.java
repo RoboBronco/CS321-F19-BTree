@@ -15,7 +15,7 @@ public class BTreeNode{
 
     public BTreeNode(int address, int degree){
         leafNode = true;
-        metaDataSize = 1 + 4 + 4 + 4 + 4 + 4;
+        metaDataSize = 1 + 4 + 4 + 4 + 4 + 4 + 4;
         nodeSize = metaDataSize + ((2*degree)*4) + 4 + ((2*degree -1)*(8+4+4)) ; 
         numObjects = 0;
         locInFile = address;
@@ -152,7 +152,5 @@ public class BTreeNode{
         }catch(IOException e){
             System.out.println("Error writing to RandomAccessFile. " + e);
         }
-    }
-
-    
+    } 
 }
