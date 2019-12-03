@@ -10,17 +10,17 @@ public class TreeObject{
         frequency = 1;
     }
 
-    public void incrementFrequency(){
-        frequency ++;
+    public void incrementFrequency(int objFreq){
+        frequency += objFreq;
     }
 
     public int getFrequency(){
         return frequency;
     }
 
-    public void setFrequency(int freq){
-        frequency = freq;
-    }
+    // public void setFrequency(int freq){
+    //     frequency = freq;
+    // }
 
     public int getSequenceLength(){
         return sequenceLength;

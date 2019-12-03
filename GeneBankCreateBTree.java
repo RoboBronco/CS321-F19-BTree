@@ -123,7 +123,7 @@ public class GeneBankCreateBTree {
 			return valid;
 		}
 		for (int i = startIndex; i < startIndex + seqLen; i++) {
-			if (data.charAt(i) == 'n') {
+			if (data.charAt(i) == 'n' || data.charAt(i) == 'N') {
 				valid = false;
 				return valid;
 			}
@@ -136,7 +136,7 @@ public class GeneBankCreateBTree {
 		for (int i = 0; i < seqLen; i++) {
 			objString += data.charAt(startIndex + i);
 		}
-		System.out.println(stringToLong(objString)); // for testing purposes
+		// System.out.println(stringToLong(objString)); // for testing purposes
 		return objString;
 	}
 
@@ -144,15 +144,15 @@ public class GeneBankCreateBTree {
 		long objValue = 0;
 		String binaryString = "";
 		for (int i = 0; i < objectString.length(); i++) {
-			if (objectString.charAt(i) == 'a') {
-				binaryString += "00";
-			} else if (objectString.charAt(i) == 'c') {
-				binaryString += "01";
-			} else if (objectString.charAt(i) == 'g') {
-				binaryString += "10";
-			} else if (objectString.charAt(i) == 't') {
-				binaryString += "11";
-			}
+			if (objectString.charAt(i) == 'a' || objectString.charAt(i) == 'A') {
+                binaryString += "00";
+            } else if (objectString.charAt(i) == 'c' || objectString.charAt(i) == 'C') {
+                binaryString += "01";
+            } else if (objectString.charAt(i) == 'g' || objectString.charAt(i) == 'G') {
+                binaryString += "10";
+            } else if (objectString.charAt(i) == 't' || objectString.charAt(i) == 'T') {
+                binaryString += "11";
+            }
 		}
 		objValue = Long.parseLong(binaryString, 2);
 		return objValue;
@@ -199,12 +199,14 @@ public class GeneBankCreateBTree {
 			foundStartPt = false;
 			foundStopPt = false;
 		}
+
 		// break data into moving window groups of sequenceLength size
 		for(int i=0; i<dataString.length()-seqLength; i++){ // for full list of data
 		// for (int i = 0; i < 50; i++) { // for testing purposes
 			if (validSequence(dataString, i, seqLength)) {
 				Long newData = stringToLong(objectString(dataString, i, seqLength));
 				TreeObject newObject = new TreeObject(newData, seqLength);
+				// Need to incorporate cache in this area...
 				workingBTree.insert(newObject);
 				
 			}
@@ -214,6 +216,7 @@ public class GeneBankCreateBTree {
 
 		scanner.close();
 		workingBTree.DiskWrite(workingBTree.root());
+		workingBTree.writeMetaData();
 		workingBTree.closePrinter();
 		workingBTree.closeRandomAccessFile();
 	}

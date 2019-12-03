@@ -54,7 +54,7 @@ public class BTreeNode{
                 objects[j] = reloadObj;
             }
         } catch(IOException e) {
-            System.out.println("Error reading from RandomAccessFile. " + e);
+            System.out.println("Error reading node from RandomAccessFile. " + e);
         }
     }
 
@@ -62,7 +62,7 @@ public class BTreeNode{
         if (objects[index] == null){
             objects[index] = object;
         }else if (objects[index].equals(object)){
-            objects[index].incrementFrequency();
+            objects[index].incrementFrequency(object.getFrequency());
         } else {
             objects[index] = object;
         }
@@ -150,7 +150,7 @@ public class BTreeNode{
             }
             
         }catch(IOException e){
-            System.out.println("Error writing to RandomAccessFile. " + e);
+            System.out.println("Error writing node to RandomAccessFile. " + e);
         }
     } 
 }

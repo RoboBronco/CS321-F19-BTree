@@ -8,28 +8,47 @@ public class BTree{
     private int seqLength;
     private int nextNodeAddress;
     private BTreeNode root;
+    private int rootAddress;
     private int nodeSize;
     private RandomAccessFile raf;
     private PrintWriter printer1;
 
     public BTree(String fileName, int sequenceLength, int degreeT)throws FileNotFoundException{
-        degree = degreeT;
-        seqLength = sequenceLength;
-        // nextNodeAddress = nodeSize + 4 + 4 + 4 + 4 + rafSize + pwSize; // Temporary value that is intended to be the MetaData size of the BTree
-        nextNodeAddress = 112;
-        String filePath = fileName + ".btree.data." + seqLength + "." + degree;
-        raf = new RandomAccessFile(filePath, "rw");
-        root = new BTreeNode(nextNodeAddress, degree);
-        nodeSize = root.nodeSize();
-        nextNodeAddress += nodeSize;
-        printer1 = new PrintWriter("dump");
+        if (fileName.endsWith(".gbk")){
+            degree = degreeT;
+            seqLength = sequenceLength;
+            // nextNodeAddress = 4 + 4 + 4 + 4 + 4;
+            nextNodeAddress = 112;  // Temporary value that is intended to be the MetaData size of the BTree
+            String filePath = fileName + ".btree.data." + seqLength + "." + degree;
+            raf = new RandomAccessFile(filePath, "rw");
+            root = new BTreeNode(nextNodeAddress, degree);
+            rootAddress = root.nodeAddress();
+            nodeSize = root.nodeSize();
+            nextNodeAddress += nodeSize;
+            printer1 = new PrintWriter("dump");
+        } else {
+            try{
+                degree = degreeT;
+                seqLength = sequenceLength;
+                raf = new RandomAccessFile(fileName, "rw");
+                int rafStartIndex = 4 + 4;
+                raf.seek(rafStartIndex);
+                nextNodeAddress = raf.readInt();
+                rootAddress = raf.readInt();
+                root = new BTreeNode(rootAddress, degree, raf);
+                nodeSize = raf.readInt();
+                printer1 = new PrintWriter("dump");
+            } catch(IOException e){
+                System.out.println("Error reading Metadata for BTree from RandomAccessFile. " + e);
+            }
+        }
     }
 
     public void insert(TreeObject k){
         BTreeNode r = root;
         for( int i=0; i<r.numObjects(); i++){
             if(k.equals(r.objects[i])){
-                r.objects[i].incrementFrequency();
+                r.objects[i].incrementFrequency(k.getFrequency());
                 return;
             }
         }
@@ -37,6 +56,7 @@ public class BTree{
             BTreeNode s = new BTreeNode(nextNodeAddress, degree);
             nextNodeAddress += nodeSize;
             root = s;
+            rootAddress = root.nodeAddress();
             s.setLeaf(false);
             s.children[0] = r.nodeAddress();
             r.setParent(s.nodeAddress());
@@ -80,7 +100,7 @@ public class BTree{
     public void insertNonFull(BTreeNode x, TreeObject k){
         for( int m=0; m<x.numObjects(); m++){
             if(k.equals(x.objects[m])){
-                x.objects[m].incrementFrequency();
+                x.objects[m].incrementFrequency(k.getFrequency());
                 // x.insertObject(k,m);
                 DiskWrite(x);
                 return;
@@ -107,7 +127,7 @@ public class BTree{
             BTreeNode childNode = new BTreeNode(x.children[i], degree, raf); // reads node - a child node of x
             for( int n=0; n<childNode.numObjects(); n++){
                 if(k.equals(childNode.objects[n])){
-                    childNode.objects[n].incrementFrequency();
+                    childNode.objects[n].incrementFrequency(k.getFrequency());
                     DiskWrite(childNode);
                     return;
                 }
@@ -190,5 +210,17 @@ public class BTree{
 
     public void closePrinter(){
         printer1.close();
+    }
+
+    public void writeMetaData(){
+        try{
+            raf.writeInt(degree);
+            raf.writeInt(seqLength);
+            raf.writeInt(nextNodeAddress);
+            raf.writeInt(rootAddress);
+            raf.writeInt(nodeSize);
+        }catch(IOException e){
+            System.out.println("Error writing BTree Metadata to RandomAccessFile. " + e);
+        }
     }
 }
