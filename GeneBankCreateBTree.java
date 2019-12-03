@@ -51,12 +51,13 @@ public class GeneBankCreateBTree {
 			useage();
 		this.fileString = fileName;
 		this.fileName = new File(fileName);
-		if(!this.fileName.exists() || this.fileName.isDirectory()) 
+		if (!this.fileName.exists() || this.fileName.isDirectory())
 			useage();
 	}
 
-	//constructor with cache and debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize, String debugLevel) throws FileNotFoundException {
+	// constructor with cache and debug
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize,
+			String debugLevel) throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
 		if (!cache.equals("1")) {
 			useage();
@@ -64,27 +65,29 @@ public class GeneBankCreateBTree {
 		try {
 			this.cacheSize = Integer.parseInt(cacheSize);
 			if (this.cacheSize < 1)
-			useage();
+				useage();
 		} catch (Exception e) {
 			useage();
 		}
 		if (debugLevel.equals("0")) {
-			//debug level 0
+			// debug level 0
 		} else if (debugLevel.equals("1")) {
-			//debug level 1, dump file
+			// debug level 1, dump file
 		} else {
 			useage();
 		}
 		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree());
 	}
-	//constructor with cache or debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSizeOrDebug) throws FileNotFoundException {
+
+	// constructor with cache or debug
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength,
+			String cacheSizeOrDebug) throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
-		if (cache.equals("0")) {	
+		if (cache.equals("0")) {
 			if (cacheSizeOrDebug.equals("0")) {
-				//debug level 0
+				// debug level 0
 			} else if (cacheSizeOrDebug.equals("1")) {
-				//debug level 1, dump file
+				// debug level 1, dump file
 			} else {
 				useage();
 			}
@@ -101,8 +104,10 @@ public class GeneBankCreateBTree {
 		}
 		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree());
 	}
-	//constructor without cache or debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength) throws FileNotFoundException {
+
+	// constructor without cache or debug
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength)
+			throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
 		if (!cache.equals("0")) {
 			useage();
@@ -111,7 +116,8 @@ public class GeneBankCreateBTree {
 	}
 
 	public static void useage() {
-		System.out.println("Usage: java GeneBankCreateBTree <0/1(no/with Cache)> <degree> <gbk file> <sequence length> [<cache size>] [<debug level>]");
+		System.out.println(
+				"Usage: java GeneBankCreateBTree <0/1(no/with Cache)> <degree> <gbk file> <sequence length> [<cache size>] [<debug level>]");
 		System.exit(-1);
 	}
 
@@ -145,14 +151,14 @@ public class GeneBankCreateBTree {
 		String binaryString = "";
 		for (int i = 0; i < objectString.length(); i++) {
 			if (objectString.charAt(i) == 'a' || objectString.charAt(i) == 'A') {
-                binaryString += "00";
-            } else if (objectString.charAt(i) == 'c' || objectString.charAt(i) == 'C') {
-                binaryString += "01";
-            } else if (objectString.charAt(i) == 'g' || objectString.charAt(i) == 'G') {
-                binaryString += "10";
-            } else if (objectString.charAt(i) == 't' || objectString.charAt(i) == 'T') {
-                binaryString += "11";
-            }
+				binaryString += "00";
+			} else if (objectString.charAt(i) == 'c' || objectString.charAt(i) == 'C') {
+				binaryString += "01";
+			} else if (objectString.charAt(i) == 'g' || objectString.charAt(i) == 'G') {
+				binaryString += "10";
+			} else if (objectString.charAt(i) == 't' || objectString.charAt(i) == 'T') {
+				binaryString += "11";
+			}
 		}
 		objValue = Long.parseLong(binaryString, 2);
 		return objValue;
@@ -169,7 +175,7 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
-		
+
 		// parse through the gbk file
 		BTree workingBTree = geneBank.getBTree();
 		int seqLength = geneBank.getSequenceLength();
@@ -191,7 +197,8 @@ public class GeneBankCreateBTree {
 					dataString += "n";
 				} else {
 					fileString = scanner.next();
-					if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g") || fileString.startsWith("t") || fileString.startsWith("n")) {
+					if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
+							|| fileString.startsWith("t") || fileString.startsWith("n")) {
 						dataString += fileString;
 					}
 				}
@@ -201,18 +208,19 @@ public class GeneBankCreateBTree {
 		}
 
 		// break data into moving window groups of sequenceLength size
-		for(int i=0; i<dataString.length()-seqLength; i++){ // for full list of data
-		// for (int i = 0; i < 50; i++) { // for testing purposes
+		for (int i = 0; i < dataString.length() - seqLength; i++) { // for full list of data
+			// for (int i = 0; i < 50; i++) { // for testing purposes
 			if (validSequence(dataString, i, seqLength)) {
 				Long newData = stringToLong(objectString(dataString, i, seqLength));
 				TreeObject newObject = new TreeObject(newData, seqLength);
 				// Need to incorporate cache in this area...
 				workingBTree.insert(newObject);
-				
+
 			}
 		}
 
-		// For DEBUG -> if debug level = 1 then call workingBTree.printTreeToFile(workingBTree.root());
+		// For DEBUG -> if debug level = 1 then call
+		// workingBTree.printTreeToFile(workingBTree.root());
 
 		scanner.close();
 		workingBTree.DiskWrite(workingBTree.root());
