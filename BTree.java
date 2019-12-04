@@ -25,7 +25,6 @@ public class BTree {
 			rootAddress = root.nodeAddress();
 			nodeSize = root.nodeSize();
 			nextNodeAddress += nodeSize;
-			// printer1 = new PrintWriter("dump");
 		} else {
 			try {
 				degree = degreeT;
@@ -37,7 +36,6 @@ public class BTree {
 				rootAddress = raf.readInt();
 				root = new BTreeNode(rootAddress, degree, raf);
 				nodeSize = raf.readInt();
-				printer1 = new PrintWriter("dump");
 			} catch (IOException e) {
 				System.out.println("Error reading Metadata for BTree from RandomAccessFile. " + e);
 			}
@@ -193,7 +191,7 @@ public class BTree {
 		}
     }
     
-    public void setDumpWriter(){
+    public void setDumpWriter() throws FileNotFoundException {
         printer1 = new PrintWriter("dump");
     }
 

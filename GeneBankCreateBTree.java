@@ -232,13 +232,14 @@ public class GeneBankCreateBTree {
 		}
 
 		if (geneBank.isDebug()) {
+			workingBTree.setDumpWriter();
 			workingBTree.printTreeToFile(workingBTree.root());
+			workingBTree.closePrinter();
 		}
 
 		scanner.close();
 		workingBTree.DiskWrite(workingBTree.root());
 		workingBTree.writeMetaData();
-		workingBTree.closePrinter();
 		workingBTree.closeRandomAccessFile();
 	}
 }
