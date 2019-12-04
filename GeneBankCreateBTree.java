@@ -7,6 +7,8 @@ public class GeneBankCreateBTree {
 	public File fileName;
 	public String fileString;
 	public BTree bTree;
+	public boolean cache = false;
+	public boolean debug = false;
 
 	public int getDegree() {
 		return this.degree;
@@ -30,6 +32,14 @@ public class GeneBankCreateBTree {
 
 	public BTree getBTree() {
 		return this.bTree;
+	}
+
+	public boolean isCache() {
+		return this.cache;
+	}
+
+	public boolean isDebug() {
+		return this.debug;
 	}
 
 	public int optimalDegree(int degree) {
@@ -56,11 +66,12 @@ public class GeneBankCreateBTree {
 	}
 
 	// constructor with cache and debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize,
-			String debugLevel) throws FileNotFoundException {
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize, String debugLevel) throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
 		if (!cache.equals("1")) {
 			useage();
+		} else {
+			this.cache = true;
 		}
 		try {
 			this.cacheSize = Integer.parseInt(cacheSize);
@@ -70,8 +81,9 @@ public class GeneBankCreateBTree {
 			useage();
 		}
 		if (debugLevel.equals("0")) {
-			// debug level 0
+			// debug level 0 standard useage messages
 		} else if (debugLevel.equals("1")) {
+			this.debug = true;
 			// debug level 1, dump file
 		} else {
 			useage();
@@ -80,18 +92,19 @@ public class GeneBankCreateBTree {
 	}
 
 	// constructor with cache or debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength,
-			String cacheSizeOrDebug) throws FileNotFoundException {
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSizeOrDebug) throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
 		if (cache.equals("0")) {
 			if (cacheSizeOrDebug.equals("0")) {
-				// debug level 0
+				// debug level 0 standard useage messages
 			} else if (cacheSizeOrDebug.equals("1")) {
+				this.debug = true;
 				// debug level 1, dump file
 			} else {
 				useage();
 			}
 		} else if (cache.equals("1")) {
+			this.cache = true;
 			try {
 				this.cacheSize = Integer.parseInt(cacheSizeOrDebug);
 				if (this.cacheSize < 1)
@@ -215,7 +228,6 @@ public class GeneBankCreateBTree {
 				TreeObject newObject = new TreeObject(newData, seqLength);
 				// Need to incorporate cache in this area...
 				workingBTree.insert(newObject);
-
 			}
 		}
 
