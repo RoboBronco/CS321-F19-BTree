@@ -25,7 +25,7 @@ public class BTree {
 			rootAddress = root.nodeAddress();
 			nodeSize = root.nodeSize();
 			nextNodeAddress += nodeSize;
-			printer1 = new PrintWriter("dump");
+			// printer1 = new PrintWriter("dump");
 		} else {
 			try {
 				degree = degreeT;
@@ -191,7 +191,11 @@ public class BTree {
 			BTreeNode child2 = new BTreeNode(printNode.children[printNode.numObjects()], degree, raf);
 			printTree(child2);
 		}
-	}
+    }
+    
+    public void setDumpWriter(){
+        printer1 = new PrintWriter("dump");
+    }
 
 	public void printTreeToFile(BTreeNode printNode) {
 		int i = 0;
