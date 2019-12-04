@@ -19,7 +19,7 @@ public class TreeObject {
 	}
 
 	public void setFrequency(int freq){
-	frequency = freq;
+		frequency = freq;
 	}
 
 	public int getSequenceLength() {
