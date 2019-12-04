@@ -231,8 +231,9 @@ public class GeneBankCreateBTree {
 			}
 		}
 
-		// For DEBUG -> if debug level = 1 then call
-		// workingBTree.printTreeToFile(workingBTree.root());
+		if (geneBank.isDebug()) {
+			workingBTree.printTreeToFile(workingBTree.root());
+		}
 
 		scanner.close();
 		workingBTree.DiskWrite(workingBTree.root());
