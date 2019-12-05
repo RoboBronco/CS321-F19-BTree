@@ -1,44 +1,44 @@
 public class TreeObject {
 
-	private Long dataString;
-	private int frequency;
-	private int sequenceLength;
+	private Long dataString;	// Main data object
+	private int frequency;	// Counter for number of occurances
+	private int sequenceLength;	// Length of the data for converting back to ACGT values
 
-	public TreeObject(Long dataS, int seqLength) {
+	public TreeObject(Long dataS, int seqLength) { // Makes a new TreeObject
 		dataString = dataS;
 		sequenceLength = seqLength;
 		frequency = 1;
 	}
 
-	public void incrementFrequency(int objFreq) {
+	public void incrementFrequency(int objFreq) {	// Increments frequency by the input value
 		frequency += objFreq;
 	}
 
-	public int getFrequency() {
+	public int getFrequency() {	// Returns the frequency
 		return frequency;
 	}
 
-	public void setFrequency(int freq){
+	public void setFrequency(int freq){	// Used to set frequency (may not be used in final product)
 		frequency = freq;
 	}
 
-	public int getSequenceLength() {
+	public int getSequenceLength() {	// Returns the sequence length for converting back to ACGT
 		return sequenceLength;
 	}
 
-	public void setSequenceLength(int seqLen) {
+	public void setSequenceLength(int seqLen) {	// Used to set sequence length (may not be used in final product)
 		sequenceLength = seqLen;
 	}
 
-	public Long getData() {
+	public Long getData() {	// Returns the main object data - the Long value
 		return dataString;
 	}
 
-	public void setData(Long dataLong) {
+	public void setData(Long dataLong) {	// Sets the Long data value
 		dataString = dataLong;
 	}
 
-	public boolean equals(TreeObject object2) {
+	public boolean equals(TreeObject object2) {	// Equals comparitor -> returns true if two Long values are the same
 		if (dataString.equals(object2.getData())) {
 			return true;
 		} else {
@@ -46,7 +46,7 @@ public class TreeObject {
 		}
 	}
 
-	public String toStringACGT() {
+	public String toStringACGT() {	// Builds and returns a string of ACGT values from the Long data
 		String binaryString = Long.toBinaryString(dataString);
 		int totalLength = sequenceLength * 2;
 		if (binaryString.length() != totalLength) {

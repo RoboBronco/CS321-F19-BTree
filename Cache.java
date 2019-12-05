@@ -13,6 +13,7 @@ public class Cache {
 	static LinkedList<BTreeNode> list;
 	static int cap;
 	static int numNodes;
+	static BTree bTree;
 	
     public static void cache(int size){
     	list = new LinkedList<>();
@@ -47,7 +48,12 @@ public class Cache {
     }
     
     public static BTreeNode remove() {
-    	return list.removeLast();
+		return list.removeLast();
+		// I think this is supposed to insert the node into the BTree when it is removed from the cache...
+		// maybe like this... bTree.updateNode(list.removeLast());
     }
-    
+	
+	public void setBTree(BTree cacheBTree){
+		bTree = cacheBTree;
+	}
 }

@@ -4,16 +4,16 @@ import java.io.RandomAccessFile;
 public class BTreeNode {
 
 	private Boolean leafNode;
-	private int metaDataSize; //
-	private int nodeSize;
-	private int numObjects;
-	private int locInFile; // byte offset in file
-	private int parentNode; // byte offset in file
-	private int nodeDegree;
-	public int[] children; // each is address in file of child nodes
-	public TreeObject[] objects; // keys/objects stored in each node
+	private int metaDataSize;	// size in bytes of MetaData
+	private int nodeSize;	// overall size in bytes of the node
+	private int numObjects;	// number of objects in the node currently
+	private int locInFile;	// address/byte-offset in file
+	private int parentNode; // address of parent node in file
+	private int nodeDegree;	// degree value for node
+	public int[] children;	// each is address in file of child nodes
+	public TreeObject[] objects;	// keys/objects stored in each node
 
-	public BTreeNode(int address, int degree) {
+	public BTreeNode(int address, int degree) {	// Make a new node
 		leafNode = true;
 		metaDataSize = 1 + 4 + 4 + 4 + 4 + 4 + 4;
 		nodeSize = metaDataSize + ((2 * degree) * 4) + 4 + ((2 * degree - 1) * (8 + 4 + 4));
@@ -25,7 +25,7 @@ public class BTreeNode {
 		objects = new TreeObject[(degree * 2) - 1];
 	}
 
-	public BTreeNode(int address, int degree, RandomAccessFile file) {
+	public BTreeNode(int address, int degree, RandomAccessFile file) {	// Load a node using RandomAccessFile
 		try {
 			RandomAccessFile raf = file;
 			raf.seek(address);
@@ -58,7 +58,7 @@ public class BTreeNode {
 		}
 	}
 
-	public void insertObject(TreeObject object, int index) {
+	public void insertObject(TreeObject object, int index) {	// Insert an object into a node
 		if (objects[index] == null) {
 			objects[index] = object;
 		} else if (objects[index].equals(object)) {
@@ -68,19 +68,19 @@ public class BTreeNode {
 		}
 	}
 
-	public TreeObject relocateObject(int index) {
+	public TreeObject relocateObject(int index) {	// Remove a TreeObject from a node (used for splitting nodes)
 		TreeObject relocateObj = objects[index];
 		objects[index] = null;
 		return relocateObj;
 	}
 
-	public int relocateChild(int index) {
+	public int relocateChild(int index) {	// Remove child pointers/addresses (used for splitting)
 		int relocateChild = children[index];
 		children[index] = -1;
 		return relocateChild;
 	}
 
-	public Boolean isLeaf() {
+	public Boolean isLeaf() {	// Boolean value to check leaf status
 		// return leafNode;
 		if (children[0] <= 0) {
 			return true;
@@ -89,43 +89,43 @@ public class BTreeNode {
 		}
 	}
 
-	public void setLeaf(boolean leafStatus) {
+	public void setLeaf(boolean leafStatus) {	// Used to set leaf status (may not be used in final product)
 		leafNode = leafStatus;
 	}
 
-	public void setParent(int parentLocation) {
+	public void setParent(int parentLocation) {	// Set parent address of current node
 		parentNode = parentLocation;
 	}
 
-	public int getParent() {
+	public int getParent() {	// Returns the address of the parent node to the current node
 		return parentNode;
 	}
 
-	public void incrementNumObjects() {
+	public void incrementNumObjects() {	// Increase the number-of-objects counter  in a node
 		numObjects++;
 	}
 
-	public void decrementNumObjects() {
+	public void decrementNumObjects() {	// Decrease the number-of-objects counter in a node
 		numObjects--;
 	}
 
-	public void setNumObjects(int newValue) {
+	public void setNumObjects(int newValue) {	// Set the number of objects in a node (used while splitting nodes)
 		numObjects = newValue;
 	}
 
-	public int numObjects() {
+	public int numObjects() {	// Returns the number of objects in a node
 		return numObjects;
 	}
 
-	public int nodeAddress() {
+	public int nodeAddress() {	// Returns the address/byte-offset in the file
 		return locInFile;
 	}
 
-	public int nodeSize() {
+	public int nodeSize() {	// Returns the node size in bytes
 		return nodeSize;
 	}
 
-	public void writeToFile(RandomAccessFile file) {
+	public void writeToFile(RandomAccessFile file) {	// Writes the node data to the file with RandomAccessFile
 		try {
 			RandomAccessFile raf = file;
 			raf.seek(locInFile);

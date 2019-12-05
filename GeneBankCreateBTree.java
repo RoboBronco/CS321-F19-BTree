@@ -241,14 +241,16 @@ public class GeneBankCreateBTree {
 		}
 
 		if (geneBank.isDebug()) {
-			workingBTree.setDumpWriter();
-			workingBTree.printTreeToFile(workingBTree.root());
-			workingBTree.closePrinter();
+			// workingBTree.setDumpWriter();
+			// workingBTree.printTreeToFile(workingBTree.root());
+			// workingBTree.closePrinter();
+			workingBTree.debug();
 		}
 
 		scanner.close();
-		workingBTree.DiskWrite(workingBTree.root());
-		workingBTree.writeMetaData();
-		workingBTree.closeRandomAccessFile();
+		// workingBTree.DiskWrite(workingBTree.root());
+		// workingBTree.writeMetaData();
+		// workingBTree.closeRandomAccessFile();
+		workingBTree.closeDownBTree();
 	}
 }

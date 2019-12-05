@@ -8,43 +8,28 @@ public class BTree {
 	private int seqLength;
 	private Boolean useCache;
 	private int nextNodeAddress;
-	private BTreeNode root;
+	private BTreeNode root, parent, leftChild, rightChild, currentNode;
 	private int rootAddress;
 	private int nodeSize;
 	private RandomAccessFile raf;
 	private PrintWriter printer1;
+	private Cache bTreeCache;
 
-	public BTree(String fileName, int sequenceLength, int degreeT, Boolean cacheBool) throws FileNotFoundException {
-		// if (fileName.endsWith(".gbk")) {
+	public BTree(String fileName, int sequenceLength, int degreeT, Boolean cacheBool) throws FileNotFoundException {	// Builds a new BTree
 			degree = degreeT;
 			seqLength = sequenceLength;
 			useCache = cacheBool;
-			// nextNodeAddress = 4 + 4 + 4 + 4 + 4;
-			nextNodeAddress = 112; // Temporary value that is intended to be the MetaData size of the BTree
+			nextNodeAddress = 4 + 4 + 1 + 4 + 4 + 4;
+			// nextNodeAddress = 112; // Temporary value that is intended to be the MetaData size of the BTree
 			String filePath = fileName + ".btree.data." + seqLength + "." + degree;
 			raf = new RandomAccessFile(filePath, "rw");
 			root = new BTreeNode(nextNodeAddress, degree);
 			rootAddress = root.nodeAddress();
 			nodeSize = root.nodeSize();
 			nextNodeAddress += nodeSize;
-		// } else {
-		// 	try {
-		// 		degree = degreeT;
-		// 		seqLength = sequenceLength;
-		// 		raf = new RandomAccessFile(fileName, "rw");
-		// 		int rafStartIndex = 4 + 4;
-		// 		raf.seek(rafStartIndex);
-		// 		nextNodeAddress = raf.readInt();
-		// 		rootAddress = raf.readInt();
-		// 		root = new BTreeNode(rootAddress, degree, raf);
-		// 		nodeSize = raf.readInt();
-		// 	} catch (IOException e) {
-		// 		System.out.println("Error reading Metadata for BTree from RandomAccessFile. " + e);
-		// 	}
-		//  }
 	}
 
-	public BTree(String fileName) throws FileNotFoundException {
+	public BTree(String fileName) throws FileNotFoundException {	// Reloads a BTree that has been writtent to file with RandomAccessFile
 		try {
 			raf = new RandomAccessFile(fileName, "rw");
 			int rafStartIndex = 0;
@@ -62,12 +47,19 @@ public class BTree {
 		}
 	}
 
-	public void insert(TreeObject k) {
+	public void insert(TreeObject k) {	// Used to insert a new object into the BTree
 		BTreeNode r = root;
 		for (int i = 0; i < r.numObjects(); i++) {
 			if (k.equals(r.objects[i])) {
 				r.objects[i].incrementFrequency(k.getFrequency());
-				return;
+				if (!useCache){
+					return;
+				} else {
+					currentNode = r;
+					// compare current to parent, left and right
+					// then add to cache
+					compareAndAddToCache();
+				}
 			}
 		}
 		if (r.numObjects() == (2 * degree) - 1) {
@@ -85,7 +77,7 @@ public class BTree {
 		}
 	}
 
-	public void splitChild(BTreeNode x, int i, BTreeNode y) {
+	public void splitChild(BTreeNode x, int i, BTreeNode y) {	// Splits a node that is at maximum object capacity
 		BTreeNode z = new BTreeNode(nextNodeAddress, degree);
 		nextNodeAddress += nodeSize;
 		z.setLeaf(y.isLeaf());
@@ -110,18 +102,35 @@ public class BTree {
 		}
 		x.objects[i] = y.relocateObject(degree - 1);
 		x.incrementNumObjects();
-		DiskWrite(y);
-		DiskWrite(z);
-		DiskWrite(x);
+		if (useCache){
+			parent = x;
+			leftChild = y;
+			rightChild = z;
+			// compare current to parent, left and right
+			// then add to cache
+			compareAndAddToCache();
+		} else {
+			DiskWrite(y);
+			DiskWrite(z);
+			DiskWrite(x);
+		}
 	}
 
-	public void insertNonFull(BTreeNode x, TreeObject k) {
+	public void insertNonFull(BTreeNode x, TreeObject k) {	// Inserts an object into a node that has space available
 		for (int m = 0; m < x.numObjects(); m++) {
 			if (k.equals(x.objects[m])) {
 				x.objects[m].incrementFrequency(k.getFrequency());
 				// x.insertObject(k,m);
-				DiskWrite(x);
-				return;
+				if (!useCache){
+					DiskWrite(x);
+					return;
+				} else {
+					currentNode = x;
+					// compare current to parent, left and right
+					// then add to cache
+					compareAndAddToCache();
+				}
+				
 			}
 		}
 		int i = x.numObjects() - 1;
@@ -132,7 +141,14 @@ public class BTree {
 			}
 			x.insertObject(k, (i + 1));
 			x.incrementNumObjects();
-			DiskWrite(x);
+			if (!useCache){
+				DiskWrite(x);
+			} else {
+				currentNode = x;
+				// compare current to parent, left and right
+				// then add to cache
+				compareAndAddToCache();
+			}
 		} else {
 			while (i >= 0 && k.getData() < x.objects[i].getData()) {
 				i--;
@@ -147,8 +163,16 @@ public class BTree {
 			for (int n = 0; n < childNode.numObjects(); n++) {
 				if (k.equals(childNode.objects[n])) {
 					childNode.objects[n].incrementFrequency(k.getFrequency());
-					DiskWrite(childNode);
-					return;
+					if (!useCache){
+						DiskWrite(childNode);
+						return;
+					} else {
+						currentNode = childNode;
+						// compare current to parent, left and right
+						// then add to cache
+						compareAndAddToCache();
+					}
+					
 				}
 			}
 			if (childNode.numObjects() == (2 * degree) - 1) {
@@ -162,7 +186,8 @@ public class BTree {
 		}
 	}
 
-	public Boolean search(BTreeNode x, TreeObject k) {
+	public Boolean search(BTreeNode x, TreeObject k) { // NEEDS TO BE FINALIZED!!!
+		// need to include cache useage and figure out expected output
 		int i = 0;
 		while (i < x.numObjects() && k.getData() > x.objects[i].getData()) {
 			i++;
@@ -179,11 +204,28 @@ public class BTree {
 		}
 	}
 
-	public void DiskWrite(BTreeNode writeNode) {
+	public BTreeNode root() {	// Returns the root node of the BTree
+		return root;
+	}
+
+	public void DiskWrite(BTreeNode writeNode) {	// Writes the BTreeNode to file with RandomAccessFile
 		writeNode.writeToFile(raf);
 	}
 
-	public void closeRandomAccessFile() {
+	private void writeMetaData() {	// Writes BTree MetaData to file with RandomAccessFile
+		try {
+			raf.writeInt(degree);
+			raf.writeInt(seqLength);
+			raf.writeBoolean(useCache);
+			raf.writeInt(nextNodeAddress);
+			raf.writeInt(rootAddress);
+			raf.writeInt(nodeSize);
+		} catch (IOException e) {
+			System.out.println("Error writing BTree Metadata to RandomAccessFile. " + e);
+		}
+	}
+
+	private void closeRandomAccessFile() {	// Closes the RandomAccessFile
 		try {
 			raf.close();
 		} catch (IOException e) {
@@ -191,11 +233,13 @@ public class BTree {
 		}
 	}
 
-	public BTreeNode root() {
-		return root;
+	public void closeDownBTree(){	// Final items that are done when finished with a BTree
+		DiskWrite(root);
+		writeMetaData();
+		closeRandomAccessFile();
 	}
 
-	public void printTree(BTreeNode printNode) {
+	public void printTree(BTreeNode printNode) {	// Prints out the BTree in order (expects input of root node to print entire BTree)
 		int i = 0;
 		while (i < printNode.numObjects()) {
 			if (printNode.children[i] > 0) {
@@ -211,11 +255,11 @@ public class BTree {
 		}
     }
     
-    public void setDumpWriter() throws FileNotFoundException {
+    private void setDumpWriter() throws FileNotFoundException {	// Used to setup PrintWriter for dump file -> used for Debug
         printer1 = new PrintWriter("dump");
     }
 
-	public void printTreeToFile(BTreeNode printNode) {
+	private void printTreeToFile(BTreeNode printNode) {	// Prints BTree to dump file -> used for Debug
 		int i = 0;
 		while (i < printNode.numObjects()) {
 			if (printNode.children[i] > 0) {
@@ -231,20 +275,62 @@ public class BTree {
 		}
 	}
 
-	public void closePrinter() {
+	private void closePrinter() {	// Closes the PrintWriter
 		printer1.close();
 	}
 
-	public void writeMetaData() {
-		try {
-			raf.writeInt(degree);
-			raf.writeInt(seqLength);
-			raf.writeBoolean(useCache);
-			raf.writeInt(nextNodeAddress);
-			raf.writeInt(rootAddress);
-			raf.writeInt(nodeSize);
-		} catch (IOException e) {
-			System.out.println("Error writing BTree Metadata to RandomAccessFile. " + e);
+	public void debug(){	// Combines all methods for Debug into one
+		setDumpWriter();
+		printTreeToFile(root);
+		closePrinter();
+	}
+
+	public void setCache(Cache cache){	// Sets the cache for cache usage option
+		bTreeCache = cache;
+		useCache = true;
+	}
+
+	private void compareAndAddToCache(){	// Compares recently changed nodes and adds them accordingly to cache
+		if (parent == null){
+			bTreeCache.add(currentNode);
+			currentNode = null;
+			return;
+		} else {
+			if (currentNode.nodeAddress() == leftChild.nodeAddress()){
+				bTreeCache.add(parent);
+				parent = null;
+				bTreeCache.add(currentNode);
+				leftChild = null;
+				currentNode = null;
+				bTreeCache.add(rightChild);
+				rightChild = null;
+				return;
+			} else if (currentNode.nodeAddress() == rightChild.nodeAddress()){
+				bTreeCache.add(parent);
+				parent = null;
+				bTreeCache.add(leftChild);
+				leftChild = null;
+				bTreeCache.add(currentNode);
+				rightChild = null;
+				currentNode = null;
+				return;
+			} else {
+				bTreeCache.add(parent);
+				parent = null;
+				bTreeCache.add(leftChild);
+				leftChild = null;
+				bTreeCache.add(rightChild);
+				rightChild = null;
+				bTreeCache.add(currentNode);
+				currentNode = null;
+				return;
+			}
 		}
+	}
+
+	public void updateNode(BTreeNode nodeToUpdate){	// Updates node data -> used when node is returned/removed from cache
+		currentNode = nodeToUpdate;
+		currentNode.writeToFile(raf);
+		currentNode = null;
 	}
 }
