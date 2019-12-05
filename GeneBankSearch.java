@@ -113,10 +113,10 @@ class GeneBankSearch{
     }
 
     public void checkCacheSize(String cacheSize) {
-        int size;
+        int size = 0;
         try {
             size = Integer.parseInt(cacheSize);
-        } catch (exception e) {
+        } catch (Exception e) {
             System.out.println("Cache size is not an integer.");
             useage();
         }
