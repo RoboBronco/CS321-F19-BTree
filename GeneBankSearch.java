@@ -3,12 +3,47 @@ import java.util.Scanner;
 
 class GeneBankSearch{
 
-    private Boolean withCache;
-    private Boolean withDebug;
+    private boolean withCache;
+    private boolean withDebug;
     private RandomAccessFile bTreeFile;
     private BTree bTree;
     private File queryFile;
+    private int cacheSize;
 
+    //no cache and debug level 0
+    private GeneBankSearch(String cache, String bTreeFile, String queryFile) {
+        check(cache, bTreeFile, queryFile);
+        if (getWithCache()) {
+            System.out.println("Cache option selected, but cache size not provided.");
+            useage();
+        }
+        System.out.println("GeneBankSearch with no cache and default debug"); //for testing
+    }
+
+    //with cache or with debug level 1
+    private GeneBankSearch(String cache, String bTreeFile, String queryFile, String cacheOrDebug) {
+        check(cache, bTreeFile, queryFile);
+        if (getWithCache())
+            checkCacheSize(cacheOrDebug);
+        else if (getWithDebug())
+            checkDebug(cacheOrDebug);
+        else
+            useage();
+        System.out.println("GeneBankSearch with possible cache or manual level debug"); //for testing
+    }
+
+    //with cache and with debug level 1
+    private GeneBankSearch(String cache, String bTreeFile, String queryFile, String cacheSize, String debug) {
+        check(cache, bTreeFile, queryFile);
+        if (!getWithCache()) {
+            System.out.println("Cache size provided, but cache option not selected");
+            useage();
+        }
+        checkCacheSize(cacheSize);
+        checkDebug(debug);
+        System.out.println("GeneBankSearch with cache and manual level debug"); //for testing
+    }
+    
     //setters
     private void setWithCache(boolean withCache) {
         this.withCache = withCache;
@@ -32,11 +67,11 @@ class GeneBankSearch{
     }
 
     //getters
-    private boolean getWithCache(boolean withCache) {
+    private boolean getWithCache() {
         return this.withCache;
     }
 
-    private boolean getWithDebug(boolean withDebug) {
+    private boolean getWithDebug() {
         return this.withDebug;
     }
 
@@ -74,25 +109,32 @@ class GeneBankSearch{
             useage();
         }
         //create BTree object
-        setBTree(bTreeFile);
+        //setBTree(bTreeFile); //not currently working
     }
 
-    //no cache and debug level 0
-    private GeneBankSearch(String cache, String bTreeFile, String queryFile) {
-        check(cache, bTreeFile, queryFile);
-        System.out.println("GeneBankSearch with no cache and default debug");
+    public void checkCacheSize(String cacheSize) {
+        int size;
+        try {
+            size = Integer.parseInt(cacheSize);
+        } catch (exception e) {
+            System.out.println("Cache size is not an integer.");
+            useage();
+        }
+        if (size < 5) {
+            System.out.println("Cache size is to small, must be 5 or greater.");
+            useage();
+        }
     }
 
-    //with cache or with debug level 1
-    private GeneBankSearch(String cache, String bTreeFile, String queryFile, String cacheOrDebug) {
-        check(cache, bTreeFile, queryFile);
-        System.out.println("GeneBankSearch with possible cache or debug level 1");
-    }
-
-    //with cache and with debug level 1
-    private GeneBankSearch(String cache, String bTreeFile, String queryFile, String cacheSize, String debug) {
-        check(cache, bTreeFile, queryFile);
-        System.out.println("GeneBankSearch with cache and debug lavel 1");
+    public void checkDebug(String debug) {
+        if (debug.equals("0")) {
+            setWithDebug(false);
+        } else if (debug.equals("1")) {
+            setWithDebug(true);
+        } else {
+            System.out.println("Debug level must be 0 or 1.");
+            useage();
+        }
     }
 
     public static void useage() {
@@ -100,7 +142,16 @@ class GeneBankSearch{
 				"java GeneBankSearch <0/1(no/with Cache)> <btree file> <query file> [<cache size>] [<debug level>]");
 		System.exit(-1);
 	}
+
     public static void main(String[] args) throws FileNotFoundException {
-        GeneBankSearch search = new GeneBankSearch(args[0], args[1], args[2]);
+        GeneBankSearch search;
+        if (args.length == 3)
+            search = new GeneBankSearch(args[0], args[1], args[2]);
+        else if (args.length == 4)
+            search = new GeneBankSearch(args[0], args[1], args[2], args[3]);
+        else if (args.length == 5)
+            search = new GeneBankSearch(args[0], args[1], args[2], args[3], args[4]);
+        else
+            useage();
     }
 }
