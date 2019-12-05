@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 public class BTree {
 	private int degree;
 	private int seqLength;
+	private Boolean useCache;
 	private int nextNodeAddress;
 	private BTreeNode root;
 	private int rootAddress;
@@ -13,10 +14,11 @@ public class BTree {
 	private RandomAccessFile raf;
 	private PrintWriter printer1;
 
-	public BTree(String fileName, int sequenceLength, int degreeT) throws FileNotFoundException {
-		if (fileName.endsWith(".gbk")) {
+	public BTree(String fileName, int sequenceLength, int degreeT, Boolean cacheBool) throws FileNotFoundException {
+		// if (fileName.endsWith(".gbk")) {
 			degree = degreeT;
 			seqLength = sequenceLength;
+			useCache = cacheBool;
 			// nextNodeAddress = 4 + 4 + 4 + 4 + 4;
 			nextNodeAddress = 112; // Temporary value that is intended to be the MetaData size of the BTree
 			String filePath = fileName + ".btree.data." + seqLength + "." + degree;
@@ -25,20 +27,38 @@ public class BTree {
 			rootAddress = root.nodeAddress();
 			nodeSize = root.nodeSize();
 			nextNodeAddress += nodeSize;
-		} else {
-			try {
-				degree = degreeT;
-				seqLength = sequenceLength;
-				raf = new RandomAccessFile(fileName, "rw");
-				int rafStartIndex = 4 + 4;
-				raf.seek(rafStartIndex);
-				nextNodeAddress = raf.readInt();
-				rootAddress = raf.readInt();
-				root = new BTreeNode(rootAddress, degree, raf);
-				nodeSize = raf.readInt();
-			} catch (IOException e) {
-				System.out.println("Error reading Metadata for BTree from RandomAccessFile. " + e);
-			}
+		// } else {
+		// 	try {
+		// 		degree = degreeT;
+		// 		seqLength = sequenceLength;
+		// 		raf = new RandomAccessFile(fileName, "rw");
+		// 		int rafStartIndex = 4 + 4;
+		// 		raf.seek(rafStartIndex);
+		// 		nextNodeAddress = raf.readInt();
+		// 		rootAddress = raf.readInt();
+		// 		root = new BTreeNode(rootAddress, degree, raf);
+		// 		nodeSize = raf.readInt();
+		// 	} catch (IOException e) {
+		// 		System.out.println("Error reading Metadata for BTree from RandomAccessFile. " + e);
+		// 	}
+		//  }
+	}
+
+	public BTree(String fileName) throws FileNotFoundException {
+		try {
+			raf = new RandomAccessFile(fileName, "rw");
+			int rafStartIndex = 0;
+			raf.seek(rafStartIndex);
+
+			degree = raf.readInt();
+			seqLength = raf.readInt();
+			useCache = raf.readBoolean();
+			nextNodeAddress = raf.readInt();
+			rootAddress = raf.readInt();
+			root = new BTreeNode(rootAddress, degree, raf);
+			nodeSize = raf.readInt();
+		} catch (IOException e) {
+			System.out.println("Error reading Metadata for BTree from RandomAccessFile. " + e);
 		}
 	}
 
@@ -219,6 +239,7 @@ public class BTree {
 		try {
 			raf.writeInt(degree);
 			raf.writeInt(seqLength);
+			raf.writeBoolean(useCache);
 			raf.writeInt(nextNodeAddress);
 			raf.writeInt(rootAddress);
 			raf.writeInt(nodeSize);
