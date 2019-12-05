@@ -3,12 +3,14 @@ import java.io.*;
 
 public class GeneBankCreateBTree {
 
-	public int degree, sequenceLength, cacheSize;
+	public int degree, sequenceLength;
+	public static int cacheSize;
 	public File fileName;
 	public String fileString;
 	public BTree bTree;
 	public boolean cache = false;
 	public boolean debug = false;
+	public static Cache newCache;
 
 	public int getDegree() {
 		return this.degree;
@@ -77,6 +79,7 @@ public class GeneBankCreateBTree {
 			this.cacheSize = Integer.parseInt(cacheSize);
 			if (this.cacheSize < 1)
 				useage();
+			this.newCache = new Cache(this.cacheSize);
 		} catch (Exception e) {
 			useage();
 		}
@@ -88,7 +91,7 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
-		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree());
+		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree(), this.cache);
 	}
 
 	// constructor with cache or debug
@@ -109,13 +112,14 @@ public class GeneBankCreateBTree {
 				this.cacheSize = Integer.parseInt(cacheSizeOrDebug);
 				if (this.cacheSize < 1)
 					useage();
+				this.newCache = new Cache(this.cacheSize);
 			} catch (Exception e) {
 				useage();
 			}
 		} else {
 			useage();
 		}
-		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree());
+		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree(), this.cache);
 	}
 
 	// constructor without cache or debug
@@ -125,7 +129,7 @@ public class GeneBankCreateBTree {
 		if (!cache.equals("0")) {
 			useage();
 		}
-		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree());
+		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree(), this.cache);
 	}
 
 	public static void useage() {
@@ -227,6 +231,14 @@ public class GeneBankCreateBTree {
 				Long newData = stringToLong(objectString(dataString, i, seqLength));
 				TreeObject newObject = new TreeObject(newData, seqLength);
 				// Need to incorporate cache in this area...
+				if(geneBank.isCache()) {
+					if(newCache.check(newObject)) {
+						newObject.incrementFrequency(newObject.getFrequency());
+					}else{
+						//newCache.add();
+					}
+				}
+				
 				workingBTree.insert(newObject);
 			}
 		}
