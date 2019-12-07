@@ -81,15 +81,15 @@ public class BTreeNode {
 	}
 
 	public Boolean isLeaf() {	// Boolean value to check leaf status
-		// return leafNode;
-		if (children[0] <= 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return leafNode;
+		// if (children[0] <= 0) {
+		// 	return true;
+		// } else {
+		// 	return false;
+		// }
 	}
 
-	public void setLeaf(boolean leafStatus) {	// Used to set leaf status (may not be used in final product)
+	public void setLeaf(boolean leafStatus) {	// Used to set leaf status
 		leafNode = leafStatus;
 	}
 
@@ -152,5 +152,26 @@ public class BTreeNode {
 		} catch (IOException e) {
 			System.out.println("Error writing node to RandomAccessFile. " + e);
 		}
+	}
+
+	public Boolean containsObject(TreeObject searchObject){	// returns true if searchObject is found in the node
+		if (numObjects == 0){
+			return false;
+		}
+		for ( int i=0; i<numObjects; i++){
+			if ( objects[i].equals(searchObject)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public String printNode(){
+		String returnString = "";
+		for (int i=0; i<numObjects; i++){
+			returnString += objects[i].getData();
+			returnString += " : ";
+		}
+		return returnString;
 	}
 }

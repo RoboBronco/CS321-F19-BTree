@@ -7,7 +7,7 @@ public class GeneBankCreateBTree {
 	public int cacheSize;
 	public File fileName;
 	public String fileString;
-	public BTree bTree;
+	public BTree workingBTree;
 	public boolean cache = false;
 	public boolean debug = false;
 
@@ -32,7 +32,7 @@ public class GeneBankCreateBTree {
 	}
 
 	public BTree getBTree() {
-		return this.bTree;
+		return this.workingBTree;
 	}
 
 	public boolean isCache() {
@@ -89,7 +89,7 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
-		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree(), isCahce());
+		this.workingBTree = new BTree(getFileString(), getSequenceLength(), getDegree(), isCahce());
 	}
 
 	// constructor with cache or debug
@@ -116,7 +116,7 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
-		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree(), isCache());
+		this.workingBTree = new BTree(getFileString(), getSequenceLength(), getDegree(), isCache());
 	}
 
 	// constructor without cache or debug
@@ -126,7 +126,7 @@ public class GeneBankCreateBTree {
 		if (!cache.equals("0")) {
 			useage();
 		}
-		this.bTree = new BTree(getFileString(), getSequenceLength(), getDegree(), isCache());
+		this.workingBTree = new BTree(getFileString(), getSequenceLength(), getDegree(), isCache());
 	}
 
 	public static void useage() {
@@ -221,36 +221,49 @@ public class GeneBankCreateBTree {
 			foundStopPt = false;
 		}
 
+		// Check for cache boolean then build cache if necessary
+		if (geneBank.isCache()){
+			BTreeCache treeCache = new BTreeCache(geneBank.cacheSize()); // How do I pass in the cache size here?
+		}
+
 		// break data into moving window groups of sequenceLength size
-		for (int i = 0; i < dataString.length() - seqLength; i++) { // for full list of data
-			// for (int i = 0; i < 50; i++) { // for testing purposes
+		for (int i = 0; i < dataString.length() - seqLength; i++) {
 			if (validSequence(dataString, i, seqLength)) {
 				Long newData = stringToLong(objectString(dataString, i, seqLength));
 				TreeObject newObject = new TreeObject(newData, seqLength);
 				// Need to incorporate cache in this area...
 				if(geneBank.isCache()) {
-					if(geneBank.getCacheSize().check(newObject)) {
-						newObject.incrementFrequency(newObject.getFrequency());
-					}else{
-						//newCache.add();
+					// I'm not sure what is going on here... -Cody
+					// if(geneBank.getCacheSize().check(newObject)) {
+					// 	newObject.incrementFrequency(newObject.getFrequency());
+					// }else{
+					// 	//newCache.add();
+					// }
+					if(treeCache.searchItem(newObject)){
+						int address = treeCache.removeFirstNode().nodeAddress();
+						BTreeNode updateNode = workingBTree.loadNode(address);
+                        for( int j=0; j<updateNode.numObjects(); j++){
+                            if (newObject.equals(updateNode.objects[j])){
+                                updateNode.insertObject(newObject,j);
+                                treeCache.add(updateNode);
+                                workingBTree.DiskWrite(updateNode);
+                            }
+                        }
+						// workingBTree.insertNonFull(workingBTree.loadNode(address),newObject);
+					} else {
+						workingBTree.insert(newObject);
 					}
+				} else {
+					workingBTree.insert(newObject);
 				}
-				
-				workingBTree.insert(newObject);
 			}
 		}
 
 		if (geneBank.isDebug()) {
-			// workingBTree.setDumpWriter();
-			// workingBTree.printTreeToFile(workingBTree.root());
-			// workingBTree.closePrinter();
 			workingBTree.debug();
 		}
 
 		scanner.close();
-		// workingBTree.DiskWrite(workingBTree.root());
-		// workingBTree.writeMetaData();
-		// workingBTree.closeRandomAccessFile();
 		workingBTree.closeDownBTree();
 	}
 }
