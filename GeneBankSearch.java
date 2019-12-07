@@ -143,15 +143,48 @@ class GeneBankSearch{
 		System.exit(-1);
 	}
 
+    private static long stringToLong(String objectString) {
+		long objValue = 0;
+		String binaryString = "";
+		for (int i = 0; i < objectString.length(); i++) {
+			if (objectString.charAt(i) == 'a' || objectString.charAt(i) == 'A') {
+				binaryString += "00";
+			} else if (objectString.charAt(i) == 'c' || objectString.charAt(i) == 'C') {
+				binaryString += "01";
+			} else if (objectString.charAt(i) == 'g' || objectString.charAt(i) == 'G') {
+				binaryString += "10";
+			} else if (objectString.charAt(i) == 't' || objectString.charAt(i) == 'T') {
+				binaryString += "11";
+			}
+		}
+		objValue = Long.parseLong(binaryString, 2);
+		return objValue;
+	}
+
     public static void main(String[] args) throws FileNotFoundException {
         GeneBankSearch search;
-        if (args.length == 3)
+        if (args.length == 3) {
             search = new GeneBankSearch(args[0], args[1], args[2]);
-        else if (args.length == 4)
+        } else if (args.length == 4) {
             search = new GeneBankSearch(args[0], args[1], args[2], args[3]);
-        else if (args.length == 5)
+        } else if (args.length == 5) {
             search = new GeneBankSearch(args[0], args[1], args[2], args[3], args[4]);
-        else
+        } else {
             useage();
+        }
+
+        // parse throught the query file and generate output 
+        BTree searchingBTree = search.getBTree();
+        File queryFile = args[2];
+        int sequenceLength = searchingBTree.getSequenceLength();
+
+        Scanner queryScanner = new Scanner(queryFile);
+        while(queryScanner.hasNextLine()){
+            String queryString = queryScanner.nextLine();
+            Long queryValue = stringToLong(queryString);
+            TreeObject searchObject = new TreeObject(queryValue, sequenceLength);
+            searchingBTree.search(searchingBTree.root(),searchObject); // Working on what to return/print/write to file
+        }
+
     }
 }

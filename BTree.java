@@ -338,4 +338,8 @@ public class BTree {
 	// public void updateNode(BTreeNode nodeToUpdate){	// Updates node data -> used when node is returned/removed from cache
 	// 	nodeToUpdate.writeToFile(raf);
 	// }
+
+	public int getSequenceLength(){
+		return seqLength;
+	}
 }
