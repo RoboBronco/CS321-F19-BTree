@@ -174,7 +174,8 @@ class GeneBankSearch{
         }
 
         // parse throught the query file and generate output 
-        BTree searchingBTree = search.getBTree();
+        File bTreeFile = args[1];
+        BTree searchingBTree = new BTree(bTreeFile);
         File queryFile = args[2];
         int sequenceLength = searchingBTree.getSequenceLength();
 

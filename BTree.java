@@ -287,53 +287,53 @@ public class BTree {
 		useCache = true;
 	}
 
-	private void compareAndAddToCache(){	// Compares recently changed nodes and adds them accordingly to cache
-		if (parent == null){
-			bTreeCache.add(currentNode);
-			DiskWrite(currentNode);
-			currentNode = null;
-			//return;
-		} else {
-			if (currentNode.nodeAddress() == parent.nodeAddress()){
-				bTreeCache.add(currentNode);
-				parent = null;
-				currentNode = null;
-				bTreeCache.add(leftChild);
-				leftChild = null;
-				bTreeCache.add(rightChild);
-				rightChild = null;
-				//return;
-			} else if (currentNode.nodeAddress() == leftChild.nodeAddress()){
-				bTreeCache.add(parent);
-				parent = null;
-				bTreeCache.add(currentNode);
-				leftChild = null;
-				currentNode = null;
-				bTreeCache.add(rightChild);
-				rightChild = null;
-				//return;
-			} else if (currentNode.nodeAddress() == rightChild.nodeAddress()){
-				bTreeCache.add(parent);
-				parent = null;
-				bTreeCache.add(leftChild);
-				leftChild = null;
-				bTreeCache.add(currentNode);
-				rightChild = null;
-				currentNode = null;
-				//return;
-			} else {
-				bTreeCache.add(parent);
-				parent = null;
-				bTreeCache.add(leftChild);
-				leftChild = null;
-				bTreeCache.add(rightChild);
-				rightChild = null;
-				bTreeCache.add(currentNode);
-				currentNode = null;
-				//return;
-			}
-		}
-	}
+	// private void compareAndAddToCache(){	// Compares recently changed nodes and adds them accordingly to cache
+	// 	if (parent == null){
+	// 		bTreeCache.add(currentNode);
+	// 		DiskWrite(currentNode);
+	// 		currentNode = null;
+	// 		//return;
+	// 	} else {
+	// 		if (currentNode.nodeAddress() == parent.nodeAddress()){
+	// 			bTreeCache.add(currentNode);
+	// 			parent = null;
+	// 			currentNode = null;
+	// 			bTreeCache.add(leftChild);
+	// 			leftChild = null;
+	// 			bTreeCache.add(rightChild);
+	// 			rightChild = null;
+	// 			//return;
+	// 		} else if (currentNode.nodeAddress() == leftChild.nodeAddress()){
+	// 			bTreeCache.add(parent);
+	// 			parent = null;
+	// 			bTreeCache.add(currentNode);
+	// 			leftChild = null;
+	// 			currentNode = null;
+	// 			bTreeCache.add(rightChild);
+	// 			rightChild = null;
+	// 			//return;
+	// 		} else if (currentNode.nodeAddress() == rightChild.nodeAddress()){
+	// 			bTreeCache.add(parent);
+	// 			parent = null;
+	// 			bTreeCache.add(leftChild);
+	// 			leftChild = null;
+	// 			bTreeCache.add(currentNode);
+	// 			rightChild = null;
+	// 			currentNode = null;
+	// 			//return;
+	// 		} else {
+	// 			bTreeCache.add(parent);
+	// 			parent = null;
+	// 			bTreeCache.add(leftChild);
+	// 			leftChild = null;
+	// 			bTreeCache.add(rightChild);
+	// 			rightChild = null;
+	// 			bTreeCache.add(currentNode);
+	// 			currentNode = null;
+	// 			//return;
+	// 		}
+	// 	}
+	// }
 
 	// public void updateNode(BTreeNode nodeToUpdate){	// Updates node data -> used when node is returned/removed from cache
 	// 	nodeToUpdate.writeToFile(raf);

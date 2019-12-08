@@ -36,6 +36,23 @@ public class BTreeCache{
         return foundIt;
     }
 
+    public int searchItemIndex(TreeObject item){ // Searches all nodes in cache for item. If found it moves that node to the top
+        int indexValue = -1;
+        cacheSearches ++;
+        for (int i=0; i<cacheLength; i++){
+            currentCacheNode = cacheList.get(i);
+            indexValue = currentCacheNode.containsObjectAtIndex(item);
+            if( indexValue != -1 ){
+                cacheHits ++;
+                if (i > 0){
+                    moveToTop(currentCacheNode);
+                }
+                return indexValue;                
+            }
+        }
+        return indexValue;
+    }
+
     public BTreeNode getNode(int index){    // Returns the node at the specified index in the cache
         return cacheList.get(index);
     }

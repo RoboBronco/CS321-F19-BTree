@@ -166,6 +166,19 @@ public class BTreeNode {
 		return false;
 	}
 
+	public int containsObjectAtIndex(TreeObject searchObject){	// returns true if searchObject is found in the node
+		int searchObjectIndex = -1;
+		if (numObjects == 0){
+			return searchObjectIndex;
+		}
+		for ( int i=0; i<numObjects; i++){
+			if ( objects[i].equals(searchObject)){
+				return i;
+			}
+		}
+		return searchObjectIndex;
+	}
+
 	public String printNode(){
 		String returnString = "";
 		for (int i=0; i<numObjects; i++){
