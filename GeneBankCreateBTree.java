@@ -249,7 +249,6 @@ public class GeneBankCreateBTree {
                                 workingBTree.DiskWrite(updateNode);
                             }
                         }
-						// workingBTree.insertNonFull(workingBTree.loadNode(address),newObject);
 					} else {
 						workingBTree.insert(newObject);
 					}

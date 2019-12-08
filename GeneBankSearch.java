@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 class GeneBankSearch{
@@ -121,7 +122,7 @@ class GeneBankSearch{
             useage();
         }
         if (size < 5) {
-            System.out.println("Cache size is to small, must be 5 or greater.");
+            System.out.println("Cache size is too small, must be 5 or greater.");
             useage();
         }
     }
@@ -173,19 +174,51 @@ class GeneBankSearch{
             useage();
         }
 
+        Boolean useCache = false;
+        if (args[0].equals("1")){
+            useCache = true;
+        }
+        int cacheSize = 0;
+
         // parse throught the query file and generate output 
         File bTreeFile = args[1];
         BTree searchingBTree = new BTree(bTreeFile);
         File queryFile = args[2];
         int sequenceLength = searchingBTree.getSequenceLength();
+        LinkedList<Long> searchValues = new LinkedList<Long>();
 
+        // build the cache if args call for a cache
+        searchingBTree.setCacheBool(false);
+        if(useCache){
+            searchingBTree.setCacheBool(true);
+            cacheSize = Integer.parseInt(args[3]);
+            treeCache = new BTreeCache(cacheSize);
+            treeCache.setBTree(searchingBTree);
+            searchingBTree.setCache(treeCache);
+        }
+
+        // This setup doesn't keep track of duplicate search items...
         Scanner queryScanner = new Scanner(queryFile);
         while(queryScanner.hasNextLine()){
             String queryString = queryScanner.nextLine();
             Long queryValue = stringToLong(queryString);
             TreeObject searchObject = new TreeObject(queryValue, sequenceLength);
-            searchingBTree.search(searchingBTree.root(),searchObject); // Working on what to return/print/write to file
+
+            if (useCache){
+                if(treeCache.searchItem(newObject)){
+                    int address = treeCache.removeFirstNode().nodeAddress();
+                    BTreeNode searchThisNode = searchingBTree.loadNode(address);
+                    searchingBTree.search(searchThisNode, searchObject);
+                } else {
+                    searchingBTree.search(searchingBTree.root(),searchObject);
+                }
+            } else {
+                searchingBTree.search(searchingBTree.root(),searchObject); // Working on what to return/print/write to file
+            }
+            
         }
 
+        queryScanner.close();
+        searchingBTree.closeDownBTree();
     }
 }

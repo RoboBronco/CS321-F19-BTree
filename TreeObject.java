@@ -72,4 +72,31 @@ public class TreeObject {
 		String outputString = stringACGT + ": " + frequency;
 		return outputString;
 	}
+
+	public String toStringACGTnoFrequency() {	// Builds and returns a string of ACGT values from the Long data, without frequency value
+		String binaryString = Long.toBinaryString(dataString);
+		int totalLength = sequenceLength * 2;
+		if (binaryString.length() != totalLength) {
+			int diffLength = totalLength - binaryString.length();
+			String binaryZeros = "";
+			for (int i = 0; i < diffLength; i++) {
+				binaryZeros += "0";
+			}
+			binaryString = binaryZeros + binaryString;
+		}
+		String stringACGT = "";
+		for (int j = 0; j < binaryString.length() - 1; j += 2) {
+			if (binaryString.subSequence(j, j + 2).equals("00")) {
+				stringACGT += "a";
+			} else if (binaryString.subSequence(j, j + 2).equals("01")) {
+				stringACGT += "c";
+			} else if (binaryString.subSequence(j, j + 2).equals("10")) {
+				stringACGT += "g";
+			} else if (binaryString.subSequence(j, j + 2).equals("11")) {
+				stringACGT += "t";
+			}
+		}
+		return stringACGT;
+	}
+
 }

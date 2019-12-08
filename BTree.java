@@ -178,18 +178,22 @@ public class BTree {
 		}
 	}
 
-	public Boolean search(BTreeNode x, TreeObject k) { // NEEDS TO BE FINALIZED!!!
+	public void search(BTreeNode x, TreeObject k) { // NEEDS TO BE FINALIZED!!!
 		// need to include cache useage and figure out expected output
 		int i = 0;
 		while (i < x.numObjects() && k.getData() > x.objects[i].getData()) {
 			i++;
 		}
 		if (i < x.numObjects() && k.equals(x.objects[i])) {
-			return true;
+			System.out.println(x.objects[i].toStringACGT());
+			if(useCache){
+				bTreeCache.add(x);
+			}
+			return;
 		}
 		if (x.isLeaf()) {
-			System.out.println("Data not found");
-			return false;
+			System.out.println("Data not found - " + k.toStringACGTnoFrequency());
+			return;
 		} else {
 			BTreeNode childNode = new BTreeNode(x.children[i], degree, raf);
 			return search(childNode, k);
@@ -341,5 +345,9 @@ public class BTree {
 
 	public int getSequenceLength(){
 		return seqLength;
+	}
+
+	public void setCacheBool(Boolean cacheBool){
+		useCache = cacheBool;
 	}
 }
