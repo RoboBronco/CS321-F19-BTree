@@ -253,6 +253,8 @@ public class GeneBankCreateBTree {
 		BTreeCache treeCache = null;
 		if (geneBank.isCache()){
 			treeCache = new BTreeCache(geneBank.getCacheSize()); // How do I pass in the cache size here?
+			treeCache.setBTree(workingBTree);
+			workingBTree.setCache(treeCache);
 		}
 
 		// break data into moving window groups of sequenceLength size
