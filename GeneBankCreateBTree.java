@@ -201,25 +201,53 @@ public class GeneBankCreateBTree {
 		Boolean foundStartPt = false;
 		Boolean foundStopPt = false;
 
-		while (scanner.hasNext()) {
-			String fileString = scanner.next();
-			if (fileString.equals(startPt))
-				foundStartPt = true;
-			while (foundStartPt && !foundStopPt) {
-				if (fileString.equals(stopPt)) {
-					foundStopPt = true;
-					dataString += "n";
-				} else {
-					fileString = scanner.next();
-					if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
-							|| fileString.startsWith("t") || fileString.startsWith("n")) {
-						dataString += fileString;
-					}
-				}
-			}
-			foundStartPt = false;
-			foundStopPt = false;
-		}
+		// while (scanner.hasNext()) {
+		// 	String fileString = scanner.next();
+		// 	if (fileString.equals(startPt))
+		// 		foundStartPt = true;
+		// 	while (foundStartPt && !foundStopPt) {
+		// 		if (fileString.equals(stopPt)) {
+		// 			foundStopPt = true;
+		// 			dataString += "n";
+		// 		} else {
+		// 			fileString = scanner.next();
+		// 			if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
+		// 					|| fileString.startsWith("t") || fileString.startsWith("n")) {
+		// 				dataString += fileString;
+		// 			}
+		// 		}
+		// 	}
+		// 	foundStartPt = false;
+		// 	foundStopPt = false;
+		// }
+		while (scanner.hasNext()){
+            while (!foundStartPt) {
+                if (scanner.hasNext()) {
+                    String fileString = scanner.next();
+                    if (fileString.equals(startPt)) {
+                        foundStartPt = true;
+                    }
+                }
+            }
+            while (!foundStopPt && foundStartPt) {
+                if (scanner.hasNext()) {
+                    String fileString = scanner.next();
+                    if (fileString.equals(stopPt)) {
+                        foundStopPt = true;
+                        break;
+                    }
+                    if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
+                            || fileString.startsWith("t") || fileString.startsWith("n") || fileString.startsWith("A")
+                            || fileString.startsWith("C") || fileString.startsWith("G") || fileString.startsWith("T")
+                            || fileString.startsWith("N")) {
+                        dataString += fileString;
+                    }
+                }
+            }
+            foundStartPt = false;
+            foundStopPt = false;
+            dataString += "n";
+        }
 
 		// Check for cache boolean then build cache if necessary
 		BTreeCache treeCache = null;
