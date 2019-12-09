@@ -89,7 +89,7 @@ public class GeneBankCreateBTree {
 		} else {
 			useage();
 		}
-		this.workingBTree = new BTree(getFileString(), getSequenceLength(), getDegree(), isCahce());
+		this.workingBTree = new BTree(getFileString(), getSequenceLength(), getDegree(), isCache());
 	}
 
 	// constructor with cache or debug
@@ -222,8 +222,9 @@ public class GeneBankCreateBTree {
 		}
 
 		// Check for cache boolean then build cache if necessary
+		BTreeCache treeCache = null;
 		if (geneBank.isCache()){
-			BTreeCache treeCache = new BTreeCache(geneBank.cacheSize()); // How do I pass in the cache size here?
+			treeCache = new BTreeCache(geneBank.getCacheSize()); // How do I pass in the cache size here?
 		}
 
 		// break data into moving window groups of sequenceLength size

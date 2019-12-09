@@ -15,7 +15,7 @@ public class BTree {
 	private PrintWriter printer1;
 	private BTreeCache bTreeCache;
 
-	public BTree(String fileName, int sequenceLength, int degreeT, Boolean cacheBool) throws FileNotFoundException {	// Builds a new BTree
+	public BTree(String fileName, int sequenceLength, int degreeT, boolean cacheBool) throws FileNotFoundException {	// Builds a new BTree
 			degree = degreeT;
 			seqLength = sequenceLength;
 			useCache = cacheBool;
@@ -196,7 +196,7 @@ public class BTree {
 			return;
 		} else {
 			BTreeNode childNode = new BTreeNode(x.children[i], degree, raf);
-			return search(childNode, k);
+			search(childNode, k);
 		}
 	}
 

@@ -180,12 +180,12 @@ class GeneBankSearch{
         }
         int cacheSize = 0;
 
-        // parse throught the query file and generate output 
-        File bTreeFile = args[1];
-        BTree searchingBTree = new BTree(bTreeFile);
-        File queryFile = args[2];
+        // parse throught the query file and generate output
+        BTree searchingBTree = new BTree(args[1]);
+        File queryFile = new File(args[2]);
         int sequenceLength = searchingBTree.getSequenceLength();
         LinkedList<Long> searchValues = new LinkedList<Long>();
+        BTreeCache treeCache = null;
 
         // build the cache if args call for a cache
         searchingBTree.setCacheBool(false);
@@ -205,7 +205,7 @@ class GeneBankSearch{
             TreeObject searchObject = new TreeObject(queryValue, sequenceLength);
 
             if (useCache){
-                if(treeCache.searchItem(newObject)){
+                if(treeCache.searchItem(searchObject)){
                     int address = treeCache.removeFirstNode().nodeAddress();
                     BTreeNode searchThisNode = searchingBTree.loadNode(address);
                     searchingBTree.search(searchThisNode, searchObject);
