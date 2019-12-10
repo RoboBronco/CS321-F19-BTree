@@ -215,6 +215,7 @@ public class BTree {
 
 	private void writeMetaData() {	// Writes BTree MetaData to file with RandomAccessFile
 		try {
+			raf.seek(0);
 			raf.writeInt(degree);
 			raf.writeInt(seqLength);
 			raf.writeBoolean(useCache);
