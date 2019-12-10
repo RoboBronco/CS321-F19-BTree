@@ -6,7 +6,6 @@ class GeneBankSearch{
 
     private boolean withCache;
     private boolean withDebug;
-    private RandomAccessFile bTreeFile;
     private BTree bTree;
     private File queryFile;
     private int cacheSize;
@@ -54,15 +53,6 @@ class GeneBankSearch{
         this.withDebug = withDebug;
     }
 
-    private void setBTree(String bTreeFile) {
-        try {
-            this.bTree = new BTree(bTreeFile);
-        } catch (Exception e) {
-            System.out.println("BTree failed to construct.");
-            useage();
-        }
-    }
-
     private void setQueryFile(File queryFile) {
         this.queryFile = queryFile;
     }
@@ -97,7 +87,7 @@ class GeneBankSearch{
         }
         //check bTreeFile
         try {
-            this.bTreeFile = new RandomAccessFile(bTreeFile, "r");
+            this.bTree = new BTree(bTreeFile);
         } catch (Exception e) {
             System.out.println("Error with <bTree file> argument.");
             useage();
@@ -109,8 +99,6 @@ class GeneBankSearch{
             System.out.println("Error with <query file> argument.");
             useage();
         }
-        //create BTree object
-        //setBTree(bTreeFile); //not currently working
     }
 
     public void checkCacheSize(String cacheSize) {
@@ -163,7 +151,7 @@ class GeneBankSearch{
 	}
 
     public static void main(String[] args) throws FileNotFoundException {
-        GeneBankSearch search;
+        GeneBankSearch search = null;
         if (args.length == 3) {
             search = new GeneBankSearch(args[0], args[1], args[2]);
         } else if (args.length == 4) {
@@ -181,8 +169,8 @@ class GeneBankSearch{
         int cacheSize = 0;
 
         // parse throught the query file and generate output
-        BTree searchingBTree = new BTree(args[1]);
-        File queryFile = new File(args[2]);
+        BTree searchingBTree = search.getBTree();
+        File queryFile = search.getQueryFile();
         int sequenceLength = searchingBTree.getSequenceLength();
         LinkedList<Long> searchValues = new LinkedList<Long>();
         BTreeCache treeCache = null;
