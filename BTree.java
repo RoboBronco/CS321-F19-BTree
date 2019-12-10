@@ -40,8 +40,8 @@ public class BTree {
 			useCache = raf.readBoolean();
 			nextNodeAddress = raf.readInt();
 			rootAddress = raf.readInt();
-			root = new BTreeNode(rootAddress, degree, raf);
 			nodeSize = raf.readInt();
+			root = new BTreeNode(rootAddress, degree, raf);
 		} catch (IOException e) {
 			System.out.println("Error reading Metadata for BTree from RandomAccessFile. " + e);
 		}
