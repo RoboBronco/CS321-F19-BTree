@@ -172,7 +172,7 @@ class GeneBankSearch{
         BTree searchingBTree = search.getBTree();
         File queryFile = search.getQueryFile();
         int sequenceLength = searchingBTree.getSequenceLength();
-        LinkedList<Long> searchValues = new LinkedList<Long>();
+        ArrayList<TreeObject> searchedObjects = new ArrayList<TreeObject>();
         BTreeCache treeCache = null;
 
         // build the cache if args call for a cache
@@ -191,19 +191,53 @@ class GeneBankSearch{
             String queryString = queryScanner.nextLine();
             Long queryValue = stringToLong(queryString);
             TreeObject searchObject = new TreeObject(queryValue, sequenceLength);
+            if (searchedObjects.length != 0){
+                int checkIndex = 0;
+                while (checkIndex < searchedObjects.length){
+                    if (searchedObjects.get(checkIndex).getData() == queryValue){
+                        return;
+                    } else {
+                        checkIndex ++;
+                    }
+                }
+            }
 
             if (useCache){
                 if(treeCache.searchItem(searchObject)){
-                    int address = treeCache.removeFirstNode().nodeAddress();
+                    int address = treeCache.getNode(1).nodeAddress();
                     BTreeNode searchThisNode = searchingBTree.loadNode(address);
-                    searchingBTree.search(searchThisNode, searchObject);
+                    TreeObject tempObject = searchingBTree.search(searchThisNode, searchObject);
+                    // if (tempObject != null){
+                    //     int insertIndex = 0;
+                    //     while ( insertIndex<searchedObjects.length && tempObject.getData()>searchedObjects.get(insertIndex).getData()){
+                    //         insertIndex ++;
+                    //     }
+                    //     if (insertIndex < searchedObjects.length){
+                    //         searchedObjects.add(insertIndex, tempObject);
+                    //     } else {
+                    //         searchedObjects.add(tempObject);
+                    //     }
+                    // }
                 } else {
-                    searchingBTree.search(searchingBTree.root(),searchObject);
+                    TreeObject tempObject = searchingBTree.search(searchingBTree.root(),searchObject);
                 }
             } else {
-                searchingBTree.search(searchingBTree.root(),searchObject); // Working on what to return/print/write to file
+                TreeObject tempObject = searchingBTree.search(searchingBTree.root(),searchObject); // Working on what to return/print/write to file
             }
-            
+            if (tempObject != null){
+                int insertIndex = 0;
+                while ( insertIndex<searchedObjects.length && tempObject.getData()>searchedObjects.get(insertIndex).getData()){
+                    insertIndex ++;
+                }
+                if (insertIndex < searchedObjects.length){
+                    searchedObjects.add(insertIndex, tempObject);
+                } else {
+                    searchedObjects.add(tempObject);
+                }
+            }   
+        }
+        for (int p=0; p<searchedObjects.length; p++){
+            System.out.println(searchedObjects.get(p).toStringACGT());
         }
 
         queryScanner.close();

@@ -101,9 +101,6 @@ public class BTree {
 		x.objects[i] = y.relocateObject(degree - 1);
 		x.incrementNumObjects();
 		if (useCache){
-			// parent = x;
-			// leftChild = y;
-			// rightChild = z;
 			bTreeCache.add(x);
 			bTreeCache.add(y);
 			bTreeCache.add(z);
@@ -178,7 +175,7 @@ public class BTree {
 		}
 	}
 
-	public void search(BTreeNode x, TreeObject k) { // NEEDS TO BE FINALIZED!!!
+	public TreeObject search(BTreeNode x, TreeObject k) { // NEEDS TO BE FINALIZED!!!
 		// need to include cache useage and figure out expected output
 		int i = 0;
 		while (i < x.numObjects() && k.getData() > x.objects[i].getData()) {
@@ -189,11 +186,11 @@ public class BTree {
 			if(useCache){
 				bTreeCache.add(x);
 			}
-			return;
+			return k;
 		}
 		if (x.isLeaf()) {
-			System.out.println("Data not found - " + k.toStringACGTnoFrequency());
-			return;
+			// System.out.println("Data not found - " + k.toStringACGTnoFrequency());
+			return null;
 		} else {
 			BTreeNode childNode = new BTreeNode(x.children[i], degree, raf);
 			search(childNode, k);
