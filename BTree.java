@@ -169,7 +169,7 @@ public class BTree {
 			i++;
 		}
 		if (i < x.numObjects() && k.equals(x.objects[i])) {
-			System.out.println(x.objects[i].toStringACGT());
+			// System.out.println(x.objects[i].toStringACGT());
 			if(useCache){
 				bTreeCache.add(x);
 			}
@@ -180,7 +180,7 @@ public class BTree {
 			return null;
 		} else {
 			BTreeNode childNode = new BTreeNode(x.children[i], degree, raf);
-			search(childNode, k);
+			return search(childNode, k);
 		}
 	}
 

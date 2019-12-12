@@ -1,6 +1,7 @@
 import java.io.*;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.*;
+// import java.util.LinkedList;
+// import java.util.Scanner;
 
 class GeneBankSearch{
 
@@ -191,9 +192,9 @@ class GeneBankSearch{
             String queryString = queryScanner.nextLine();
             Long queryValue = stringToLong(queryString);
             TreeObject searchObject = new TreeObject(queryValue, sequenceLength);
-            if (searchedObjects.length != 0){
+            if (searchedObjects.size() != 0){
                 int checkIndex = 0;
-                while (checkIndex < searchedObjects.length){
+                while (checkIndex < searchedObjects.size()){
                     if (searchedObjects.get(checkIndex).getData() == queryValue){
                         return;
                     } else {
@@ -202,6 +203,7 @@ class GeneBankSearch{
                 }
             }
 
+           
             if (useCache){
                 if(treeCache.searchItem(searchObject)){
                     int address = treeCache.getNode(1).nodeAddress();
@@ -220,24 +222,27 @@ class GeneBankSearch{
                     // }
                 } else {
                     TreeObject tempObject = searchingBTree.search(searchingBTree.root(),searchObject);
+                    searchObject = tempObject;
                 }
             } else {
                 TreeObject tempObject = searchingBTree.search(searchingBTree.root(),searchObject); // Working on what to return/print/write to file
+                searchObject = tempObject;
             }
-            if (tempObject != null){
+            if (searchObject != null){
                 int insertIndex = 0;
-                while ( insertIndex<searchedObjects.length && tempObject.getData()>searchedObjects.get(insertIndex).getData()){
+                while ( insertIndex<searchedObjects.size() && searchObject.getData()>searchedObjects.get(insertIndex).getData()){
                     insertIndex ++;
                 }
-                if (insertIndex < searchedObjects.length){
-                    searchedObjects.add(insertIndex, tempObject);
+                if (insertIndex < searchedObjects.size()){
+                    searchedObjects.add(insertIndex, searchObject);
                 } else {
-                    searchedObjects.add(tempObject);
+                    searchedObjects.add(searchObject);
                 }
             }   
         }
-        for (int p=0; p<searchedObjects.length; p++){
+        for (int p=0; p<searchedObjects.size(); p++){
             System.out.println(searchedObjects.get(p).toStringACGT());
+            // System.out.println(searchedObjects.get(p).getData());
         }
 
         queryScanner.close();
