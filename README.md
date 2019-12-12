@@ -23,6 +23,7 @@ This program builds a BTree data structure by reading and writing data to and fr
         Next Node Address for a new node (int) - 4 bytes
         Address of Root Node (int) - 4 bytes
         Node Size (int) - 4 bytes
+    The BTree MetaData is written to the file when the BTree is finished and closed down.
     
     All data following the first 21 bytes is the data of the BTreeNodes. Each BTreeNode is organized and written to the file in the following order:
         Leaf Node (boolean) - 1 byte
