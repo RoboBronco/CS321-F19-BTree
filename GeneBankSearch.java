@@ -192,34 +192,11 @@ class GeneBankSearch{
             String queryString = queryScanner.nextLine();
             Long queryValue = stringToLong(queryString);
             TreeObject searchObject = new TreeObject(queryValue, sequenceLength);
-            if (searchedObjects.size() != 0){
-                int checkIndex = 0;
-                while (checkIndex < searchedObjects.size()){
-                    if (searchedObjects.get(checkIndex).getData() == queryValue){
-                        return;
-                    } else {
-                        checkIndex ++;
-                    }
-                }
-            }
-
-           
             if (useCache){
                 if(treeCache.searchItem(searchObject)){
                     int address = treeCache.getNode(1).nodeAddress();
                     BTreeNode searchThisNode = searchingBTree.loadNode(address);
                     TreeObject tempObject = searchingBTree.search(searchThisNode, searchObject);
-                    // if (tempObject != null){
-                    //     int insertIndex = 0;
-                    //     while ( insertIndex<searchedObjects.length && tempObject.getData()>searchedObjects.get(insertIndex).getData()){
-                    //         insertIndex ++;
-                    //     }
-                    //     if (insertIndex < searchedObjects.length){
-                    //         searchedObjects.add(insertIndex, tempObject);
-                    //     } else {
-                    //         searchedObjects.add(tempObject);
-                    //     }
-                    // }
                 } else {
                     TreeObject tempObject = searchingBTree.search(searchingBTree.root(),searchObject);
                     searchObject = tempObject;
@@ -233,16 +210,17 @@ class GeneBankSearch{
                 while ( insertIndex<searchedObjects.size() && searchObject.getData()>searchedObjects.get(insertIndex).getData()){
                     insertIndex ++;
                 }
-                if (insertIndex < searchedObjects.size()){
-                    searchedObjects.add(insertIndex, searchObject);
-                } else {
+                if (insertIndex == searchedObjects.size()){
                     searchedObjects.add(searchObject);
+                } else if (searchObject.equals(searchedObjects.get(insertIndex))){    
+                    // Do nothing, data has already been found
+                } else {
+                    searchedObjects.add(insertIndex, searchObject);
                 }
             }   
         }
         for (int p=0; p<searchedObjects.size(); p++){
             System.out.println(searchedObjects.get(p).toStringACGT());
-            // System.out.println(searchedObjects.get(p).getData());
         }
 
         queryScanner.close();
