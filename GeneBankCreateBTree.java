@@ -179,6 +179,10 @@ public class GeneBankCreateBTree {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
+
+		// We need to include the situation where the degree value = 0 -> use optimal degree
+		// optimal degree = int(4062/40)
+
 		GeneBankCreateBTree geneBank = null;
 		if (args.length == 4) {
 			geneBank = new GeneBankCreateBTree(args[0], args[1], args[2], args[3]);
@@ -201,25 +205,6 @@ public class GeneBankCreateBTree {
 		Boolean foundStartPt = false;
 		Boolean foundStopPt = false;
 
-		// while (scanner.hasNext()) {
-		// 	String fileString = scanner.next();
-		// 	if (fileString.equals(startPt))
-		// 		foundStartPt = true;
-		// 	while (foundStartPt && !foundStopPt) {
-		// 		if (fileString.equals(stopPt)) {
-		// 			foundStopPt = true;
-		// 			dataString += "n";
-		// 		} else {
-		// 			fileString = scanner.next();
-		// 			if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
-		// 					|| fileString.startsWith("t") || fileString.startsWith("n")) {
-		// 				dataString += fileString;
-		// 			}
-		// 		}
-		// 	}
-		// 	foundStartPt = false;
-		// 	foundStopPt = false;
-		// }
 		while (scanner.hasNext()){
             while (!foundStartPt) {
                 if (scanner.hasNext()) {
@@ -252,7 +237,7 @@ public class GeneBankCreateBTree {
 		// Check for cache boolean then build cache if necessary
 		BTreeCache treeCache = null;
 		if (geneBank.isCache()){
-			treeCache = new BTreeCache(geneBank.getCacheSize()); // How do I pass in the cache size here?
+			treeCache = new BTreeCache(geneBank.getCacheSize());
 			treeCache.setBTree(workingBTree);
 			workingBTree.setCache(treeCache);
 		}

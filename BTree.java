@@ -19,8 +19,7 @@ public class BTree {
 			degree = degreeT;
 			seqLength = sequenceLength;
 			useCache = cacheBool;
-			// nextNodeAddress = 4 + 4 + 1 + 4 + 4 + 4;
-			nextNodeAddress = 30; // Temporary value that is intended to be the MetaData size of the BTree
+			nextNodeAddress = 4 + 4 + 1 + 4 + 4 + 4;
 			String filePath = fileName + ".btree.data." + seqLength + "." + degree;
 			raf = new RandomAccessFile(filePath, "rw");
 			root = new BTreeNode(nextNodeAddress, degree);
@@ -53,8 +52,6 @@ public class BTree {
 			if (k.equals(r.objects[i])) {
 				r.objects[i].incrementFrequency(k.getFrequency());
 				if (useCache){
-					//currentNode = r;
-					//compareAndAddToCache();
 					bTreeCache.add(r);
 				}
 				return;
@@ -116,9 +113,6 @@ public class BTree {
 				x.objects[m].incrementFrequency(k.getFrequency());
 				// x.insertObject(k,m);
 				if (useCache){
-					//currentNode = x;
-					//DiskWrite(x);
-					//compareAndAddToCache();
 					bTreeCache.add(x);
 				}
 				DiskWrite(x);
@@ -134,9 +128,6 @@ public class BTree {
 			x.insertObject(k, (i + 1));
 			x.incrementNumObjects();
 			if (useCache){
-				//currentNode = x;
-				//DiskWrite(x);
-				//compareAndAddToCache();
 				bTreeCache.add(x);
 			}
 			DiskWrite(x);
@@ -155,9 +146,6 @@ public class BTree {
 				if (k.equals(childNode.objects[n])) {
 					childNode.objects[n].incrementFrequency(k.getFrequency());
 					if (useCache){
-						// currentNode = childNode;
-						// DiskWrite(childNode);
-						// compareAndAddToCache();
 						bTreeCache.add(childNode);
 					}
 					DiskWrite(childNode);
@@ -175,8 +163,7 @@ public class BTree {
 		}
 	}
 
-	public TreeObject search(BTreeNode x, TreeObject k) { // NEEDS TO BE FINALIZED!!!
-		// need to include cache useage and figure out expected output
+	public TreeObject search(BTreeNode x, TreeObject k) { // Searches through the tree starting at node x and returns the TreeObject when found, else returns null
 		int i = 0;
 		while (i < x.numObjects() && k.getData() > x.objects[i].getData()) {
 			i++;
@@ -288,58 +275,6 @@ public class BTree {
 		bTreeCache = cache;
 		useCache = true;
 	}
-
-	// private void compareAndAddToCache(){	// Compares recently changed nodes and adds them accordingly to cache
-	// 	if (parent == null){
-	// 		bTreeCache.add(currentNode);
-	// 		DiskWrite(currentNode);
-	// 		currentNode = null;
-	// 		//return;
-	// 	} else {
-	// 		if (currentNode.nodeAddress() == parent.nodeAddress()){
-	// 			bTreeCache.add(currentNode);
-	// 			parent = null;
-	// 			currentNode = null;
-	// 			bTreeCache.add(leftChild);
-	// 			leftChild = null;
-	// 			bTreeCache.add(rightChild);
-	// 			rightChild = null;
-	// 			//return;
-	// 		} else if (currentNode.nodeAddress() == leftChild.nodeAddress()){
-	// 			bTreeCache.add(parent);
-	// 			parent = null;
-	// 			bTreeCache.add(currentNode);
-	// 			leftChild = null;
-	// 			currentNode = null;
-	// 			bTreeCache.add(rightChild);
-	// 			rightChild = null;
-	// 			//return;
-	// 		} else if (currentNode.nodeAddress() == rightChild.nodeAddress()){
-	// 			bTreeCache.add(parent);
-	// 			parent = null;
-	// 			bTreeCache.add(leftChild);
-	// 			leftChild = null;
-	// 			bTreeCache.add(currentNode);
-	// 			rightChild = null;
-	// 			currentNode = null;
-	// 			//return;
-	// 		} else {
-	// 			bTreeCache.add(parent);
-	// 			parent = null;
-	// 			bTreeCache.add(leftChild);
-	// 			leftChild = null;
-	// 			bTreeCache.add(rightChild);
-	// 			rightChild = null;
-	// 			bTreeCache.add(currentNode);
-	// 			currentNode = null;
-	// 			//return;
-	// 		}
-	// 	}
-	// }
-
-	// public void updateNode(BTreeNode nodeToUpdate){	// Updates node data -> used when node is returned/removed from cache
-	// 	nodeToUpdate.writeToFile(raf);
-	// }
 
 	public int getSequenceLength(){
 		return seqLength;
