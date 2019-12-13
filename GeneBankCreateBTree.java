@@ -44,7 +44,8 @@ public class GeneBankCreateBTree {
 	}
 
 	public int optimalDegree(int degree) {
-		return 127;
+		int optimalDegree = 4062/40;
+		return optimalDegree;
 	}
 
 	public void check(String degree, String fileName, String sequenceLength) {
@@ -179,9 +180,6 @@ public class GeneBankCreateBTree {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
-
-		// We need to include the situation where the degree value = 0 -> use optimal degree
-		// optimal degree = int(4062/40)
 
 		GeneBankCreateBTree geneBank = null;
 		if (args.length == 4) {
