@@ -1,9 +1,7 @@
 import java.io.*;
 import java.util.*;
-// import java.util.LinkedList;
-// import java.util.Scanner;
 
-class GeneBankSearch{
+class GeneBankSearch {
 
     private boolean withCache;
     private boolean withDebug;
@@ -11,17 +9,17 @@ class GeneBankSearch{
     private File queryFile;
     private int cacheSize;
 
-    //no cache and debug level 0
+    // no cache and debug level 0
     private GeneBankSearch(String cache, String bTreeFile, String queryFile) {
         check(cache, bTreeFile, queryFile);
         if (getWithCache()) {
             System.out.println("Cache option selected, but cache size not provided.");
             useage();
         }
-        System.out.println("GeneBankSearch with no cache and default debug"); //for testing
+        System.out.println("GeneBankSearch with no cache and default debug"); // for testing
     }
 
-    //with cache or with debug level 1
+    // with cache or with debug level 1
     private GeneBankSearch(String cache, String bTreeFile, String queryFile, String cacheOrDebug) {
         check(cache, bTreeFile, queryFile);
         if (getWithCache())
@@ -30,10 +28,10 @@ class GeneBankSearch{
             checkDebug(cacheOrDebug);
         else
             useage();
-        System.out.println("GeneBankSearch with possible cache or manual level debug"); //for testing
+        System.out.println("GeneBankSearch with possible cache or manual level debug"); // for testing
     }
 
-    //with cache and with debug level 1
+    // with cache and with debug level 1
     private GeneBankSearch(String cache, String bTreeFile, String queryFile, String cacheSize, String debug) {
         check(cache, bTreeFile, queryFile);
         if (!getWithCache()) {
@@ -42,10 +40,10 @@ class GeneBankSearch{
         }
         checkCacheSize(cacheSize);
         checkDebug(debug);
-        System.out.println("GeneBankSearch with cache and manual level debug"); //for testing
+        System.out.println("GeneBankSearch with cache and manual level debug"); // for testing
     }
-    
-    //setters
+
+    // setters
     private void setWithCache(boolean withCache) {
         this.withCache = withCache;
     }
@@ -58,7 +56,7 @@ class GeneBankSearch{
         this.queryFile = queryFile;
     }
 
-    //getters
+    // getters
     private boolean getWithCache() {
         return this.withCache;
     }
@@ -75,10 +73,10 @@ class GeneBankSearch{
         return this.queryFile;
     }
 
-    //checks for every constructor
+    // checks for every constructor
     private void check(String cache, String bTreeFile, String queryFile) {
-        //check cache
-        if(cache.equals("0")) {
+        // check cache
+        if (cache.equals("0")) {
             this.withCache = false;
         } else if (cache.equals("1")) {
             this.withCache = true;
@@ -86,14 +84,14 @@ class GeneBankSearch{
             System.out.println("Error with (no/with Cache) argument.");
             useage();
         }
-        //check bTreeFile
+        // check bTreeFile
         try {
             this.bTree = new BTree(bTreeFile);
         } catch (Exception e) {
             System.out.println("Error with <bTree file> argument.");
             useage();
         }
-        //check queryFile
+        // check queryFile
         try {
             this.queryFile = new File(queryFile);
         } catch (Exception e) {
@@ -128,28 +126,28 @@ class GeneBankSearch{
     }
 
     public static void useage() {
-		System.out.println(
-				"java GeneBankSearch <0/1(no/with Cache)> <btree file> <query file> [<cache size>] [<debug level>]");
-		System.exit(-1);
-	}
+        System.out.println(
+                "java GeneBankSearch <0/1(no/with Cache)> <btree file> <query file> [<cache size>] [<debug level>]");
+        System.exit(-1);
+    }
 
     private static long stringToLong(String objectString) {
-		long objValue = 0;
-		String binaryString = "";
-		for (int i = 0; i < objectString.length(); i++) {
-			if (objectString.charAt(i) == 'a' || objectString.charAt(i) == 'A') {
-				binaryString += "00";
-			} else if (objectString.charAt(i) == 'c' || objectString.charAt(i) == 'C') {
-				binaryString += "01";
-			} else if (objectString.charAt(i) == 'g' || objectString.charAt(i) == 'G') {
-				binaryString += "10";
-			} else if (objectString.charAt(i) == 't' || objectString.charAt(i) == 'T') {
-				binaryString += "11";
-			}
-		}
-		objValue = Long.parseLong(binaryString, 2);
-		return objValue;
-	}
+        long objValue = 0;
+        String binaryString = "";
+        for (int i = 0; i < objectString.length(); i++) {
+            if (objectString.charAt(i) == 'a' || objectString.charAt(i) == 'A') {
+                binaryString += "00";
+            } else if (objectString.charAt(i) == 'c' || objectString.charAt(i) == 'C') {
+                binaryString += "01";
+            } else if (objectString.charAt(i) == 'g' || objectString.charAt(i) == 'G') {
+                binaryString += "10";
+            } else if (objectString.charAt(i) == 't' || objectString.charAt(i) == 'T') {
+                binaryString += "11";
+            }
+        }
+        objValue = Long.parseLong(binaryString, 2);
+        return objValue;
+    }
 
     public static void main(String[] args) throws FileNotFoundException {
         GeneBankSearch search = null;
@@ -164,7 +162,7 @@ class GeneBankSearch{
         }
 
         Boolean useCache = false;
-        if (args[0].equals("1")){
+        if (args[0].equals("1")) {
             useCache = true;
         }
         int cacheSize = 0;
@@ -178,7 +176,7 @@ class GeneBankSearch{
 
         // build the cache if args call for a cache
         searchingBTree.setCacheBool(false);
-        if(useCache){
+        if (useCache) {
             searchingBTree.setCacheBool(true);
             cacheSize = Integer.parseInt(args[3]);
             treeCache = new BTreeCache(cacheSize);
@@ -186,40 +184,44 @@ class GeneBankSearch{
             searchingBTree.setCache(treeCache);
         }
 
-        // This setup doesn't keep track of duplicate search items...
+        // This setup prints out query results in order and no duplicates
         Scanner queryScanner = new Scanner(queryFile);
-        while(queryScanner.hasNextLine()){
+        while (queryScanner.hasNextLine()) {
             String queryString = queryScanner.nextLine();
             Long queryValue = stringToLong(queryString);
             TreeObject searchObject = new TreeObject(queryValue, sequenceLength);
-            if (useCache){
-                if(treeCache.searchItem(searchObject)){
+            if (useCache) {
+                if (treeCache.searchItem(searchObject)) {
                     int address = treeCache.getNode(1).nodeAddress();
                     BTreeNode searchThisNode = searchingBTree.loadNode(address);
                     TreeObject tempObject = searchingBTree.search(searchThisNode, searchObject);
                 } else {
-                    TreeObject tempObject = searchingBTree.search(searchingBTree.root(),searchObject);
+                    TreeObject tempObject = searchingBTree.search(searchingBTree.root(), searchObject);
                     searchObject = tempObject;
                 }
             } else {
-                TreeObject tempObject = searchingBTree.search(searchingBTree.root(),searchObject); // Working on what to return/print/write to file
+                TreeObject tempObject = searchingBTree.search(searchingBTree.root(), searchObject); // Working on what
+                                                                                                    // to
+                                                                                                    // return/print/write
+                                                                                                    // to file
                 searchObject = tempObject;
             }
-            if (searchObject != null){
+            if (searchObject != null) {
                 int insertIndex = 0;
-                while ( insertIndex<searchedObjects.size() && searchObject.getData()>searchedObjects.get(insertIndex).getData()){
-                    insertIndex ++;
+                while (insertIndex < searchedObjects.size()
+                        && searchObject.getData() > searchedObjects.get(insertIndex).getData()) {
+                    insertIndex++;
                 }
-                if (insertIndex == searchedObjects.size()){
+                if (insertIndex == searchedObjects.size()) {
                     searchedObjects.add(searchObject);
-                } else if (searchObject.equals(searchedObjects.get(insertIndex))){    
+                } else if (searchObject.equals(searchedObjects.get(insertIndex))) {
                     // Do nothing, data has already been found
                 } else {
                     searchedObjects.add(insertIndex, searchObject);
                 }
-            }   
+            }
         }
-        for (int p=0; p<searchedObjects.size(); p++){
+        for (int p = 0; p < searchedObjects.size(); p++) {
             System.out.println(searchedObjects.get(p).toStringACGT());
         }
 

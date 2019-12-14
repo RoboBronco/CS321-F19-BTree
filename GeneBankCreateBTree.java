@@ -44,7 +44,7 @@ public class GeneBankCreateBTree {
 	}
 
 	public int optimalDegree(int degree) {
-		int optimalDegree = 4062/40;
+		int optimalDegree = 4062 / 40;
 		return optimalDegree;
 	}
 
@@ -59,7 +59,7 @@ public class GeneBankCreateBTree {
 			this.degree = optimalDegree(this.degree);
 		} else if (this.degree < 0) {
 			useage();
-		} 
+		}
 		if (this.sequenceLength < 1 || this.sequenceLength > 31) {
 			useage();
 		}
@@ -71,7 +71,8 @@ public class GeneBankCreateBTree {
 	}
 
 	// constructor with cache and debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize, String debugLevel) throws FileNotFoundException {
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSize,
+			String debugLevel) throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
 		if (!cache.equals("1")) {
 			useage();
@@ -97,7 +98,8 @@ public class GeneBankCreateBTree {
 	}
 
 	// constructor with cache or debug
-	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength, String cacheSizeOrDebug) throws FileNotFoundException {
+	public GeneBankCreateBTree(String cache, String degree, String fileName, String sequenceLength,
+			String cacheSizeOrDebug) throws FileNotFoundException {
 		check(degree, fileName, sequenceLength);
 		if (cache.equals("0")) {
 			if (cacheSizeOrDebug.equals("0")) {
@@ -206,38 +208,38 @@ public class GeneBankCreateBTree {
 		Boolean foundStartPt = false;
 		Boolean foundStopPt = false;
 
-		while (scanner.hasNext()){
-            while (!foundStartPt) {
-                if (scanner.hasNext()) {
-                    String fileString = scanner.next();
-                    if (fileString.equals(startPt)) {
-                        foundStartPt = true;
-                    }
-                }
-            }
-            while (!foundStopPt && foundStartPt) {
-                if (scanner.hasNext()) {
-                    String fileString = scanner.next();
-                    if (fileString.equals(stopPt)) {
-                        foundStopPt = true;
-                        break;
-                    }
-                    if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
-                            || fileString.startsWith("t") || fileString.startsWith("n") || fileString.startsWith("A")
-                            || fileString.startsWith("C") || fileString.startsWith("G") || fileString.startsWith("T")
-                            || fileString.startsWith("N")) {
-                        dataString += fileString;
-                    }
-                }
-            }
-            foundStartPt = false;
-            foundStopPt = false;
-            dataString += "n";
-        }
+		while (scanner.hasNext()) {
+			while (!foundStartPt) {
+				if (scanner.hasNext()) {
+					String fileString = scanner.next();
+					if (fileString.equals(startPt)) {
+						foundStartPt = true;
+					}
+				}
+			}
+			while (!foundStopPt && foundStartPt) {
+				if (scanner.hasNext()) {
+					String fileString = scanner.next();
+					if (fileString.equals(stopPt)) {
+						foundStopPt = true;
+						break;
+					}
+					if (fileString.startsWith("a") || fileString.startsWith("c") || fileString.startsWith("g")
+							|| fileString.startsWith("t") || fileString.startsWith("n") || fileString.startsWith("A")
+							|| fileString.startsWith("C") || fileString.startsWith("G") || fileString.startsWith("T")
+							|| fileString.startsWith("N")) {
+						dataString += fileString;
+					}
+				}
+			}
+			foundStartPt = false;
+			foundStopPt = false;
+			dataString += "n";
+		}
 
 		// Check for cache boolean then build cache if necessary
 		BTreeCache treeCache = null;
-		if (geneBank.isCache()){
+		if (geneBank.isCache()) {
 			treeCache = new BTreeCache(geneBank.getCacheSize());
 			treeCache.setBTree(workingBTree);
 			workingBTree.setCache(treeCache);
@@ -248,24 +250,17 @@ public class GeneBankCreateBTree {
 			if (validSequence(dataString, i, seqLength)) {
 				Long newData = stringToLong(objectString(dataString, i, seqLength));
 				TreeObject newObject = new TreeObject(newData, seqLength);
-				// Need to incorporate cache in this area...
-				if(geneBank.isCache()) {
-					// I'm not sure what is going on here... -Cody
-					// if(geneBank.getCacheSize().check(newObject)) {
-					// 	newObject.incrementFrequency(newObject.getFrequency());
-					// }else{
-					// 	//newCache.add();
-					// }
-					if(treeCache.searchItem(newObject)){
+				if (geneBank.isCache()) {
+					if (treeCache.searchItem(newObject)) {
 						int address = treeCache.removeFirstNode().nodeAddress();
 						BTreeNode updateNode = workingBTree.loadNode(address);
-                        for( int j=0; j<updateNode.numObjects(); j++){
-                            if (newObject.equals(updateNode.objects[j])){
-                                updateNode.insertObject(newObject,j);
-                                treeCache.add(updateNode);
-                                workingBTree.DiskWrite(updateNode);
-                            }
-                        }
+						for (int j = 0; j < updateNode.numObjects(); j++) {
+							if (newObject.equals(updateNode.objects[j])) {
+								updateNode.insertObject(newObject, j);
+								treeCache.add(updateNode);
+								workingBTree.DiskWrite(updateNode);
+							}
+						}
 					} else {
 						workingBTree.insert(newObject);
 					}
