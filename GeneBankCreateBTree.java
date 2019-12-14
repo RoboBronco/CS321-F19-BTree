@@ -55,16 +55,19 @@ public class GeneBankCreateBTree {
 		} catch (Exception e) {
 			useage();
 		}
-		if (this.degree < 0)
-			useage();
-		else if (this.degree == 0)
+		if (this.degree == 1 || this.degree == 0) {
 			this.degree = optimalDegree(this.degree);
-		if (this.sequenceLength < 1 || this.sequenceLength > 31)
+		} else if (this.degree < 0) {
 			useage();
+		} 
+		if (this.sequenceLength < 1 || this.sequenceLength > 31) {
+			useage();
+		}
 		this.fileString = fileName;
 		this.fileName = new File(fileName);
-		if (!this.fileName.exists() || this.fileName.isDirectory())
+		if (!this.fileName.exists() || this.fileName.isDirectory()) {
 			useage();
+		}
 	}
 
 	// constructor with cache and debug
